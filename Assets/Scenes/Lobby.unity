@@ -131,7 +131,6 @@ GameObject:
   - component: {fileID: 68861734}
   - component: {fileID: 68861733}
   - component: {fileID: 68861732}
-  - component: {fileID: 68861735}
   m_Layer: 5
   m_Name: Placeholder
   m_TagString: Untagged
@@ -198,7 +197,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Enter Session ID...
+  m_text: "\uC138\uC158 \uC544\uC774\uB514 \uC785\uB825..."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7a57b3234719c854f8da2f05e3485e82, type: 2}
   m_sharedMaterial: {fileID: -2135709839747086819, guid: 7a57b3234719c854f8da2f05e3485e82, type: 2}
@@ -277,21 +276,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 68861730}
   m_CullTransparentMesh: 1
---- !u!114 &68861735
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 68861730}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7bcffb5d278128e42a363baa689dfd6d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  content:
-    en: Enter Session ID...
-    kr: "\uC138\uC158 \uC544\uC774\uB514 \uC785\uB825..."
 --- !u!1 &154074326
 GameObject:
   m_ObjectHideFlags: 0
@@ -303,7 +287,6 @@ GameObject:
   - component: {fileID: 154074327}
   - component: {fileID: 154074330}
   - component: {fileID: 154074329}
-  - component: {fileID: 154074328}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -330,21 +313,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &154074328
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 154074326}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7bcffb5d278128e42a363baa689dfd6d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  content:
-    en: Join
-    kr: "\uCC38\uAC00\uD558\uAE30"
 --- !u!114 &154074329
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -365,7 +333,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Join
+  m_text: "\uCC38\uC5EC"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7a57b3234719c854f8da2f05e3485e82, type: 2}
   m_sharedMaterial: {fileID: -2135709839747086819, guid: 7a57b3234719c854f8da2f05e3485e82, type: 2}
@@ -501,7 +469,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Players: 8/8'
+  m_text: "\uD50C\uB808\uC774\uC5B4 \uC218: 8/8"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7a57b3234719c854f8da2f05e3485e82, type: 2}
   m_sharedMaterial: {fileID: -2135709839747086819, guid: 7a57b3234719c854f8da2f05e3485e82, type: 2}
@@ -613,7 +581,7 @@ RectTransform:
   m_Father: {fileID: 1618906921}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 0.99999994}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -2191,7 +2159,6 @@ GameObject:
   - component: {fileID: 1156331802}
   - component: {fileID: 1156331805}
   - component: {fileID: 1156331804}
-  - component: {fileID: 1156331803}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -2218,21 +2185,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1156331803
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1156331801}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7bcffb5d278128e42a363baa689dfd6d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  content:
-    en: Start Session
-    kr: "\uC138\uC158 \uC2DC\uC791\uD558\uAE30"
 --- !u!114 &1156331804
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2253,7 +2205,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Start Session
+  m_text: "\uC138\uC158 \uC2DC\uC791\uD558\uAE30"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7a57b3234719c854f8da2f05e3485e82, type: 2}
   m_sharedMaterial: {fileID: -2135709839747086819, guid: 7a57b3234719c854f8da2f05e3485e82, type: 2}
@@ -2587,7 +2539,6 @@ GameObject:
   - component: {fileID: 1457400816}
   - component: {fileID: 1457400819}
   - component: {fileID: 1457400818}
-  - component: {fileID: 1457400817}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -2614,21 +2565,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1457400817
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1457400815}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7bcffb5d278128e42a363baa689dfd6d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  content:
-    en: Join Session
-    kr: "\uC138\uC158 \uCC38\uC5EC\uD558\uAE30"
 --- !u!114 &1457400818
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2649,7 +2585,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Join Session
+  m_text: "\uC138\uC158 \uCC38\uC5EC\uD558\uAE30"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7a57b3234719c854f8da2f05e3485e82, type: 2}
   m_sharedMaterial: {fileID: -2135709839747086819, guid: 7a57b3234719c854f8da2f05e3485e82, type: 2}
@@ -2739,7 +2675,6 @@ GameObject:
   - component: {fileID: 1513206725}
   - component: {fileID: 1513206728}
   - component: {fileID: 1513206727}
-  - component: {fileID: 1513206726}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -2766,21 +2701,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1513206726
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1513206724}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7bcffb5d278128e42a363baa689dfd6d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  content:
-    en: Refresh
-    kr: "\uC0C8\uB85C\uACE0\uCE68"
 --- !u!114 &1513206727
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2801,7 +2721,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Refresh
+  m_text: "\uC0C8\uB85C\uACE0\uCE68"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7a57b3234719c854f8da2f05e3485e82, type: 2}
   m_sharedMaterial: {fileID: -2135709839747086819, guid: 7a57b3234719c854f8da2f05e3485e82, type: 2}
@@ -2955,8 +2875,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 465, y: -115}
-  m_SizeDelta: {x: 900, y: 200}
+  m_AnchoredPosition: {x: 475.268, y: -115}
+  m_SizeDelta: {x: 920.536, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1630554960
 MonoBehaviour:
@@ -3047,7 +2967,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 30}
+  m_SizeDelta: {x: 0, y: 230}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1852540271
 MonoBehaviour:
@@ -3221,7 +3141,6 @@ GameObject:
   - component: {fileID: 1927504759}
   - component: {fileID: 1927504762}
   - component: {fileID: 1927504761}
-  - component: {fileID: 1927504760}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -3248,21 +3167,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -25}
   m_SizeDelta: {x: 450, y: 50}
   m_Pivot: {x: 0.5, y: 1}
---- !u!114 &1927504760
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1927504758}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7bcffb5d278128e42a363baa689dfd6d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  content:
-    en: Start/Join Session
-    kr: "\uC138\uC158 \uC2DC\uC791/\uCC38\uC5EC"
 --- !u!114 &1927504761
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3283,7 +3187,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Start/Join Session
+  m_text: "\uC138\uC158 \uCC38\uC5EC/\uC2DC\uC791\uD558\uAE30"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7a57b3234719c854f8da2f05e3485e82, type: 2}
   m_sharedMaterial: {fileID: -2135709839747086819, guid: 7a57b3234719c854f8da2f05e3485e82, type: 2}
@@ -3372,8 +3276,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1972419921}
   - component: {fileID: 1972419924}
-  - component: {fileID: 1972419923}
-  - component: {fileID: 1972419922}
+  - component: {fileID: 1972419925}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -3400,22 +3303,15 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1972419922
-MonoBehaviour:
+--- !u!222 &1972419924
+CanvasRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1972419920}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7bcffb5d278128e42a363baa689dfd6d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  content:
-    en: Play
-    kr: "\uD50C\uB808\uC774"
---- !u!114 &1972419923
+  m_CullTransparentMesh: 1
+--- !u!114 &1972419925
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3435,7 +3331,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Play
+  m_text: "\uD50C\uB808\uC774"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7a57b3234719c854f8da2f05e3485e82, type: 2}
   m_sharedMaterial: {fileID: -2135709839747086819, guid: 7a57b3234719c854f8da2f05e3485e82, type: 2}
@@ -3444,8 +3340,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281479730
-  m_fontColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -3506,14 +3402,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!222 &1972419924
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1972419920}
-  m_CullTransparentMesh: 1
 --- !u!1 &1973652765
 GameObject:
   m_ObjectHideFlags: 0
