@@ -15,6 +15,11 @@ public class Player : Entity
     [Header("Movements")]
     [SerializeField] float moveSpeed = 5.0f;
     [SerializeField] Transform rotator, flipped;
+    
+    [Header("Ward System")]
+    [SerializeField] private KeyCode wardPlaceKey = KeyCode.W;
+    [SerializeField] private Ward.WardType currentWardType = Ward.WardType.Vision;
+    [SerializeField] private float wardPlacementRange = 3f;
 
     public readonly NetworkVariable<Team> team = new(Team.None);
     public readonly NetworkVariable<bool> PVP = new(false);
@@ -49,6 +54,7 @@ public class Player : Entity
         {
             topLayer.OnStateUpdate();
             UpdateRotation();
+            UpdateWardPlacement();
         }
     }
     private void OnEnable()
@@ -84,6 +90,55 @@ public class Player : Entity
     //Movement
     [Rpc(SendTo.Owner)]
     public void TeleportRpc(Vector2 position) => transform.position = position;
+    
+    // Ward System
+    private void UpdateWardPlacement()
+    {
+        if (Input.GetKeyDown(wardPlaceKey))
+        {
+            PlaceWard();
+        }
+        
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            currentWardType = Ward.WardType.Vision;
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            currentWardType = Ward.WardType.Damage;
+        }
+    }
+    
+    private void PlaceWard()
+    {
+        if (WardManager.Instance != null)
+        {
+            Vector3 placementPosition = GetWardPlacementPosition();
+            WardManager.Instance.PlaceWardServerRpc(placementPosition, currentWardType);
+        }
+    }
+    
+    private Vector3 GetWardPlacementPosition()
+    {
+        Vector3 playerPosition = transform.position;
+        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mousePosition.z = 0f;
+        
+        Vector3 direction = (mousePosition - playerPosition).normalized;
+        Vector3 placementPosition = playerPosition + direction * wardPlacementRange;
+        
+        return placementPosition;
+    }
+    
+    public void SetWardType(Ward.WardType wardType)
+    {
+        currentWardType = wardType;
+    }
+    
+    public Ward.WardType GetCurrentWardType()
+    {
+        return currentWardType;
+    }
     void UpdateRotation()
     {
         Vector2 dir;
