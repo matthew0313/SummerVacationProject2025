@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
-using Cysharp.Threading.Tasks.CompilerServices;
 using Unity.Netcode;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
@@ -47,7 +45,7 @@ public class SessionManager : MonoBehaviour
     }
 
     public const string playerNamePropertyKey = "playerName";
-    async UniTask<Dictionary<string, PlayerProperty>> GetPlayerProperties()
+    async Task<Dictionary<string, PlayerProperty>> GetPlayerProperties()
     {
         string playerName = await AuthenticationService.Instance.GetPlayerNameAsync();
         PlayerProperty playerNameProperty = new PlayerProperty(playerName, VisibilityPropertyOptions.Public);
@@ -57,7 +55,7 @@ public class SessionManager : MonoBehaviour
         };
     }
     public const int maxPlayers = 8;
-    private async UniTask<SessionOptions> GetSessionOptions()
+    private async Task<SessionOptions> GetSessionOptions()
     {
         Dictionary<string, PlayerProperty> playerProperties = await GetPlayerProperties();
 
@@ -70,31 +68,31 @@ public class SessionManager : MonoBehaviour
         };
         return options.WithDistributedAuthorityNetwork();
     }
-    public async UniTaskVoid StartSession()
+    public async void StartSession()
     {
         activeSession = await MultiplayerService.Instance.CreateSessionAsync(await GetSessionOptions());
     }
-    public async UniTaskVoid JoinOrStartSession(string sessionId)
+    public async void JoinOrStartSession(string sessionId)
     {
         activeSession = await MultiplayerService.Instance.CreateOrJoinSessionAsync(sessionId, await GetSessionOptions());
         Debug.Log($"Session {activeSession.Id} Joined");
     }
-    public async UniTaskVoid JoinSessionById(string sessionId)
+    public async void JoinSessionById(string sessionId)
     {
         activeSession = await MultiplayerService.Instance.JoinSessionByIdAsync(sessionId);
         Debug.Log($"Session {activeSession.Id} Joined");
     }
-    public async UniTaskVoid JoinSessionByCode(string sessionCode)
+    public async void JoinSessionByCode(string sessionCode)
     {
         activeSession = await MultiplayerService.Instance.JoinSessionByCodeAsync(sessionCode);
         Debug.Log($"Session {activeSession.Id} Joined");
     }
-    public async UniTaskVoid KickPlayer(string playerId)
+    public async void KickPlayer(string playerId)
     {
         if (!activeSession.IsHost) return;
         await activeSession.AsHost().RemovePlayerAsync(playerId);
     }
-    public async UniTask<IList<ISessionInfo>> QuerySessions()
+    public async Task<IList<ISessionInfo>> QuerySessions()
     {
         var sessionQueryOptions = new QuerySessionsOptions()
         {
@@ -106,7 +104,7 @@ public class SessionManager : MonoBehaviour
         var results = await MultiplayerService.Instance.QuerySessionsAsync(sessionQueryOptions);
         return results.Sessions;
     }
-    public async UniTask LeaveSession()
+    public async Task LeaveSession()
     {
         if(activeSession != null)
         {
