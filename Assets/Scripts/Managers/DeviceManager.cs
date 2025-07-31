@@ -6,7 +6,12 @@ using UnityEngine.InputSystem;
 public class DeviceManager : MonoBehaviour
 {
     static DeviceManager Instance;
-    public DeviceManager() => Instance = this;
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    static void Init()
+    {
+        Instance = Instantiate(Resources.Load<DeviceManager>("DeviceManager"));
+        DontDestroyOnLoad(Instance.gameObject);
+    }
 
     [Header("Debug")]
     [SerializeField] bool overrideDeviceType = false;

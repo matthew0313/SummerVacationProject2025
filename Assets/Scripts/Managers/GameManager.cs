@@ -20,4 +20,8 @@ public class GameManager : NetworkBehaviour
     }
     public void AddPlayer(Player player) => players.Add(player);
     public void RemovePlayer(Player player) => players.Remove(player);
+    private void Update()
+    {
+        if (!IsOwner) return;
+    }
 }

@@ -12,6 +12,8 @@ public class Player : Entity
     public Player_HpComp hpComp { get; private set; }
     Rigidbody2D rb;
 
+    public Animator anim;
+
     [Header("Movements")]
     [SerializeField] float moveSpeed = 5.0f;
     [SerializeField] Transform rotator, flipped;
@@ -43,6 +45,7 @@ public class Player : Entity
             topLayer.OnStateEnter();
         }
     }
+    readonly int relationID = Animator.StringToHash("Relation");
     private void Update()
     {
         if (IsOwner)
@@ -50,6 +53,7 @@ public class Player : Entity
             topLayer.OnStateUpdate();
             UpdateRotation();
         }
+        if (localPlayer != null) anim.SetInteger(relationID, (int)localPlayer.GetRelation(this));
     }
     private void OnEnable()
     {
@@ -72,6 +76,7 @@ public class Player : Entity
 
     public Relation GetRelation(Entity other)
     {
+        if (other == this) return Relation.Self;
         if (other is Player player)
         {
             if (!PVP.Value) return Relation.None;
@@ -160,5 +165,6 @@ public enum Relation
 {
     None = 0,
     Enemy = 1,
-    Ally = 2
+    Ally = 2,
+    Self = 3
 }
