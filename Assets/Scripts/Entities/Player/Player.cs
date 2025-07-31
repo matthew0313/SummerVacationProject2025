@@ -5,23 +5,21 @@ using UnityEngine;
 using static UnityEngine.UI.Image;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(NetworkTransform), typeof(NetworkRigidbody2D))]
-[RequireComponent(typeof(Player_HpComp))]
+[RequireComponent(typeof(Player_HpComp), typeof(Player_WardComp))]
 public class Player : Entity
 {
     public static Player localPlayer;
     public Player_HpComp hpComp { get; private set; }
+    public Player_WardComp wardComp { get; private set; }
+
     Rigidbody2D rb;
+    Camera mainCam;
 
     public Animator anim;
 
     [Header("Movements")]
     [SerializeField] float moveSpeed = 5.0f;
     [SerializeField] Transform rotator, flipped;
-    
-    [Header("Ward System")]
-    [SerializeField] private KeyCode wardPlaceKey = KeyCode.W;
-    [SerializeField] private Ward.WardType currentWardType = Ward.WardType.Vision;
-    [SerializeField] private float wardPlacementRange = 3f;
 
     public readonly NetworkVariable<Team> team = new(Team.None);
     public readonly NetworkVariable<bool> PVP = new(false);
@@ -31,7 +29,9 @@ public class Player : Entity
     private void Awake()
     {
         hpComp = GetComponent<Player_HpComp>();
+        wardComp = GetComponent<Player_WardComp>();
         rb = GetComponent<Rigidbody2D>();
+        mainCam = Camera.main;
     }
     private void Start()
     {
@@ -57,9 +57,9 @@ public class Player : Entity
         {
             topLayer.OnStateUpdate();
             UpdateRotation();
-            UpdateWardPlacement();
         }
         if (localPlayer != null) anim.SetInteger(relationID, (int)localPlayer.GetRelation(this));
+        
     }
     private void OnEnable()
     {
@@ -82,6 +82,7 @@ public class Player : Entity
 
     public Relation GetRelation(Entity other)
     {
+        if (other == null) return Relation.None;
         if (other == this) return Relation.Self;
         if (other is Player player)
         {
@@ -95,60 +96,9 @@ public class Player : Entity
     //Movement
     [Rpc(SendTo.Owner)]
     public void TeleportRpc(Vector2 position) => transform.position = position;
-    
-    // Ward System
-    private void UpdateWardPlacement()
-    {
-        if (Input.GetKeyDown(wardPlaceKey))
-        {
-            PlaceWard();
-        }
-        
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            currentWardType = Ward.WardType.Vision;
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            currentWardType = Ward.WardType.Damage;
-        }
-    }
-    
-    private void PlaceWard()
-    {
-        if (WardManager.Instance != null)
-        {
-            Vector3 placementPosition = GetWardPlacementPosition();
-            WardManager.Instance.PlaceWardServerRpc(placementPosition, currentWardType);
-        }
-    }
-    
-    private Vector3 GetWardPlacementPosition()
-    {
-        Vector3 playerPosition = transform.position;
-        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mousePosition.z = 0f;
-        
-        Vector3 direction = (mousePosition - playerPosition).normalized;
-        Vector3 placementPosition = playerPosition + direction * wardPlacementRange;
-        
-        return placementPosition;
-    }
-    
-    public void SetWardType(Ward.WardType wardType)
-    {
-        currentWardType = wardType;
-    }
-    
-    public Ward.WardType GetCurrentWardType()
-    {
-        return currentWardType;
-    }
     void UpdateRotation()
     {
-        Vector2 dir;
-        if (DeviceManager.deviceType == DeviceType.Desktop) dir = (Input.mousePosition - rotator.position).normalized;
-        else dir = InputManager.Instance.Aim.ReadValue<Vector2>();
+        Vector2 dir = (mainCam.ScreenToWorldPoint(Input.mousePosition) - rotator.position).normalized;
         rotator.rotation = Quaternion.Euler(0, 0, Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg);
         if(dir.x > 0)
         {
@@ -161,6 +111,7 @@ public class Player : Entity
             rotator.localScale = new Vector3(1.0f, -1.0f, 1.0f);
         }
     }
+    Vector2 MoveInput() => new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
     class TopLayer : TopLayer<Player>
     {
         public TopLayer(Player origin) : base(origin)
@@ -177,7 +128,7 @@ public class Player : Entity
             public override void OnStateUpdate()
             {
                 base.OnStateUpdate();
-                if (InputManager.Instance.Movement.ReadValue<Vector2>().magnitude > 0.1f)
+                if (origin.MoveInput().magnitude > 0.1f)
                 {
                     parentLayer.ChangeState("Moving"); return;
                 }
@@ -190,11 +141,11 @@ public class Player : Entity
             public override void OnStateUpdate()
             {
                 base.OnStateUpdate();
-                if (InputManager.Instance.Movement.ReadValue<Vector2>().magnitude <= 0.1f)
+                if (origin.MoveInput().magnitude <= 0.1f)
                 {
                     parentLayer.ChangeState("Idle"); return;
                 }
-                origin.rb.linearVelocity = InputManager.Instance.Movement.ReadValue<Vector2>() * origin.moveSpeed;
+                origin.rb.linearVelocity = origin.MoveInput() * origin.moveSpeed;
             }
         }
         class Dead : State<Player>

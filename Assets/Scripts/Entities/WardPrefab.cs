@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "WardPrefab", menuName = "Game/Ward Prefab")]
+/*[CreateAssetMenu(fileName = "WardPrefab", menuName = "Game/Ward Prefab")]
 public class WardPrefab : ScriptableObject
 {
     [Header("Ward Prefab Settings")]
@@ -90,4 +90,4 @@ public class WardPrefab : ScriptableObject
             }
         }
     }
-} 
+} */

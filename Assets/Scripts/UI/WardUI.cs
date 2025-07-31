@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using Unity.Netcode;
 
-public class WardUI : MonoBehaviour
+/*public class WardUI : MonoBehaviour
 {
     [Header("Ward Status")]
     [SerializeField] private GameObject wardStatusPanel;
@@ -219,4 +219,4 @@ public class WardUI : MonoBehaviour
             wardManager.OnWardCooldownChanged -= OnWardCooldownChanged;
         }
     }
-} 
+} */
