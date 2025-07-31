@@ -17,7 +17,7 @@ public class Player : Entity
     [SerializeField] Transform rotator, flipped;
     
     [Header("Ward System")]
-    [SerializeField] private KeyCode wardPlaceKey = KeyCode.W;
+    [SerializeField] private KeyCode wardPlaceKey = KeyCode.Q;
     [SerializeField] private Ward.WardType currentWardType = Ward.WardType.Vision;
     [SerializeField] private float wardPlacementRange = 3f;
 
@@ -111,10 +111,39 @@ public class Player : Entity
     
     private void PlaceWard()
     {
-        if (WardManager.Instance != null)
+        try
         {
-            Vector3 placementPosition = GetWardPlacementPosition();
-            WardManager.Instance.PlaceWardServerRpc(placementPosition, currentWardType);
+            Debug.Log($"PlaceWard called - WardManager.Instance: {WardManager.Instance != null}");
+            
+            if (WardManager.Instance == null)
+            {
+                Debug.LogWarning("WardManager.Instance is null!");
+                return;
+            }
+            
+            if (NetworkManager.Singleton == null)
+            {
+                Debug.LogWarning("NetworkManager.Singleton is null!");
+                return;
+            }
+            
+            ulong clientId = NetworkManager.Singleton.LocalClientId;
+            Debug.Log($"ClientId: {clientId}");
+            
+            bool canPlace = WardManager.Instance.CanPlaceWard(clientId);
+            Debug.Log($"CanPlaceWard: {canPlace}");
+            
+            if (canPlace)
+            {
+                Vector3 placementPosition = GetWardPlacementPosition();
+                Debug.Log($"Placement position: {placementPosition}");
+                WardManager.Instance.PlaceWardServerRpc(placementPosition, currentWardType);
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning($"Ward placement failed: {e.Message}");
+            Debug.LogWarning($"Stack trace: {e.StackTrace}");
         }
     }
     

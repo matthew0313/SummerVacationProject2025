@@ -26,6 +26,17 @@ public class WardUI : MonoBehaviour
     
     private void Start()
     {
+        StartCoroutine(InitializeWardManager());
+    }
+    
+    private System.Collections.IEnumerator InitializeWardManager()
+    {
+        // WardManager가 초기화될 때까지 대기
+        while (WardManager.Instance == null)
+        {
+            yield return null;
+        }
+        
         wardManager = WardManager.Instance;
         
         if (wardManager != null)

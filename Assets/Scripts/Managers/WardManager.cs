@@ -18,21 +18,74 @@ public class WardManager : NetworkBehaviour
     private Dictionary<ulong, float> playerWardCooldowns = new Dictionary<ulong, float>();
     private List<Ward> allWards = new List<Ward>();
     
-    public static WardManager Instance { get; private set; }
+    private static WardManager _instance;
+    private static readonly object _lock = new object();
+    public static WardManager Instance 
+    { 
+        get 
+        {
+            if (_instance == null)
+            {
+                lock (_lock)
+                {
+                    if (_instance == null)
+                    {
+                        // 씬에서 WardManager를 찾아서 인스턴스 설정
+                        WardManager foundManager = FindObjectOfType<WardManager>();
+                        if (foundManager != null)
+                        {
+                            _instance = foundManager;
+                        }
+                        else
+                        {
+                            // WardManager가 없으면 새로 생성
+                            GameObject managerObject = new GameObject("WardManager");
+                            _instance = managerObject.AddComponent<WardManager>();
+                            DontDestroyOnLoad(managerObject);
+                        }
+                    }
+                }
+            }
+            return _instance;
+        }
+        private set => _instance = value;
+    }
     
     public event System.Action<Ward> OnWardPlaced;
     public event System.Action<Ward> OnWardDestroyed;
     public event System.Action<ulong> OnWardCooldownChanged;
     
-    private void Awake()
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    static void Initialize()
     {
-        if (Instance == null)
+        // 씬이 로드되기 전에 WardManager 인스턴스를 찾아서 설정
+        WardManager foundManager = FindObjectOfType<WardManager>();
+        if (foundManager != null)
         {
-            Instance = this;
+            _instance = foundManager;
         }
         else
         {
-            Destroy(gameObject);
+            // WardManager가 없으면 새로 생성
+            GameObject managerObject = new GameObject("WardManager");
+            _instance = managerObject.AddComponent<WardManager>();
+            DontDestroyOnLoad(managerObject);
+        }
+    }
+    
+    private void Awake()
+    {
+        lock (_lock)
+        {
+            if (_instance == null)
+            {
+                _instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
         }
     }
     
