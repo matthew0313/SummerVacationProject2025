@@ -61,13 +61,16 @@ public class Player : Entity
         }
         if (localPlayer != null) anim.SetInteger(relationID, (int)localPlayer.GetRelation(this));
     }
-    private void OnEnable()
+    public override void OnNetworkSpawn()
     {
-        GameManager.Instance.AddPlayer(this);
+        base.OnNetworkSpawn();
+        GameManager.Instance.RegisterPlayer(OwnerClientId, this);
     }
-    private void OnDisable()
+
+    public override void OnNetworkDespawn()
     {
-        GameManager.Instance.RemovePlayer(this);
+        base.OnNetworkDespawn();
+        GameManager.Instance.UnregisterPlayer(OwnerClientId);
     }
     public override void OnDestroy()
     {

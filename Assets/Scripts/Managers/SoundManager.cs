@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -6,8 +8,8 @@ public class SoundManager : NetworkBehaviour
     public static SoundManager Instance { get; private set; }
 
     [Header("Audio Sources")]
-    [SerializeField] private AudioSource bgmSource; // 배경음악용
-    [SerializeField] private AudioSource sfxSource; // UI 효과음용
+    [SerializeField] private AudioSource bgmSource;
+    [SerializeField] private AudioSource sfxSource;
 
     [Header("Audio Clips")]
     public AudioClip lobbyBGM;
@@ -15,7 +17,8 @@ public class SoundManager : NetworkBehaviour
     public AudioClip wardPlaceSound;
     public AudioClip wardDestroySound;
     public AudioClip uiClickSound;
-    public AudioClip bulletFireSound; // 총알 발사음 추가
+    public AudioClip bulletFireSound;
+    public AudioClip teamAlertSound; // 팀 전용 사운드 클립 예시
 
     private void Awake()
     {
@@ -30,6 +33,7 @@ public class SoundManager : NetworkBehaviour
         }
     }
 
+    // --- BGM & Local SFX ---
     public void PlayBGM(AudioClip clip)
     {
         if (bgmSource.clip == clip) return;
@@ -38,33 +42,71 @@ public class SoundManager : NetworkBehaviour
         bgmSource.Play();
     }
 
-    public void PlayUISound(AudioClip clip)
+    public void PlayLocalSound(AudioClip clip)
     {
         sfxSource.PlayOneShot(clip);
     }
 
-    // 모든 클라이언트에게 특정 위치에서 사운드 재생을 지시하는 RPC
-    [ClientRpc]
-    public void PlaySoundClientRpc(string clipName, Vector3 position)
+    // --- Networked Sounds ---
+    public void PlayGlobalSound(string clipName, Vector3 position)
     {
-        AudioClip clipToPlay = null;
-        switch (clipName)
+        PlaySoundServerRpc(clipName, position, SoundAudience.Global, default);
+    }
+
+    public void PlayTeamSound(string clipName, Vector3 position, Team team)
+    {
+        PlaySoundServerRpc(clipName, position, SoundAudience.Team, team);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void PlaySoundServerRpc(string clipName, Vector3 position, SoundAudience audience, Team targetTeam)
+    {
+        ClientRpcParams clientRpcParams = default;
+
+        if (audience == SoundAudience.Team)
         {
-            case "wardPlace":
-                clipToPlay = wardPlaceSound;
-                break;
-            case "wardDestroy":
-                clipToPlay = wardDestroySound;
-                break;
-            case "bulletFire":
-                clipToPlay = bulletFireSound;
-                break;
+            var teamPlayers = GameManager.Instance.GetTeamPlayers(targetTeam);
+            var clientIds = teamPlayers.Select(p => p.OwnerClientId).ToArray();
+
+            if (clientIds.Length == 0) return; // 팀원이 없으면 실행하지 않음
+
+            clientRpcParams = new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = clientIds
+                }
+            };
         }
 
+        PlaySoundClientRpc(clipName, position, clientRpcParams);
+    }
+
+    [ClientRpc]
+    private void PlaySoundClientRpc(string clipName, Vector3 position, ClientRpcParams clientRpcParams = default)
+    {
+        AudioClip clipToPlay = GetClipFromName(clipName);
         if (clipToPlay != null)
         {
-            // 3D 공간의 특정 위치에서 사운드를 재생합니다.
             AudioSource.PlayClipAtPoint(clipToPlay, position);
         }
+    }
+
+    private AudioClip GetClipFromName(string clipName)
+    {
+        switch (clipName)
+        {
+            case "wardPlace": return wardPlaceSound;
+            case "wardDestroy": return wardDestroySound;
+            case "bulletFire": return bulletFireSound;
+            case "teamAlert": return teamAlertSound;
+            default: return null;
+        }
+    }
+
+    private enum SoundAudience
+    {
+        Global,
+        Team
     }
 }

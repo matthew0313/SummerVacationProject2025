@@ -127,6 +127,8 @@ public class WardManager : NetworkBehaviour
             
             playerWardCooldowns[clientId] = wardCooldown;
             
+            SoundManager.Instance.PlayGlobalSound("wardPlace", position);
+
             var wardComponent = ward.GetComponent<WardComponent>();
             if (wardComponent != null)
             {
