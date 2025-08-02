@@ -37,6 +37,7 @@ public class Ward : Entity, IDamagable
         if(wardHealth.Value <= 0)
         {
             dead = true;
+            SoundManager.Instance.PlayGlobalSound("wardDestroy", transform.position);
             anim.SetBool(deadID, true);
             StartCoroutine(Despawning());
         }

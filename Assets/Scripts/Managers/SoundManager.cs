@@ -3,6 +3,14 @@ using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 
+// 사운드 이름과 오디오 클립을 연결하기 위한 클래스
+[System.Serializable]
+public class Sound
+{
+    public string name;
+    public AudioClip clip;
+}
+
 public class SoundManager : NetworkBehaviour
 {
     public static SoundManager Instance { get; private set; }
@@ -11,14 +19,9 @@ public class SoundManager : NetworkBehaviour
     [SerializeField] private AudioSource bgmSource;
     [SerializeField] private AudioSource sfxSource;
 
-    [Header("Audio Clips")]
-    public AudioClip lobbyBGM;
-    public AudioClip gameBGM;
-    public AudioClip wardPlaceSound;
-    public AudioClip wardDestroySound;
-    public AudioClip uiClickSound;
-    public AudioClip bulletFireSound;
-    public AudioClip teamAlertSound; // 팀 전용 사운드 클립 예시
+    [Header("Sound Clips")]
+    [SerializeField] private List<Sound> sounds; // 사운드 목록
+    private Dictionary<string, AudioClip> soundDictionary;
 
     private void Awake()
     {
@@ -26,6 +29,13 @@ public class SoundManager : NetworkBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+
+            // 사운드 목록을 딕셔너리로 변환하여 빠르게 찾을 수 있도록 함
+            soundDictionary = new Dictionary<string, AudioClip>();
+            foreach (var sound in sounds)
+            {
+                soundDictionary[sound.name] = sound.clip;
+            }
         }
         else
         {
@@ -34,32 +44,38 @@ public class SoundManager : NetworkBehaviour
     }
 
     // --- BGM & Local SFX ---
-    public void PlayBGM(AudioClip clip)
+    public void PlayBGM(string bgmName)
     {
-        if (bgmSource.clip == clip) return;
-        bgmSource.clip = clip;
-        bgmSource.loop = true;
-        bgmSource.Play();
+        if (soundDictionary.TryGetValue(bgmName, out AudioClip clip))
+        {
+            if (bgmSource.clip == clip) return;
+            bgmSource.clip = clip;
+            bgmSource.loop = true;
+            bgmSource.Play();
+        }
     }
 
-    public void PlayLocalSound(AudioClip clip)
+    public void PlayLocalSound(string soundName)
     {
-        sfxSource.PlayOneShot(clip);
+        if (soundDictionary.TryGetValue(soundName, out AudioClip clip))
+        {
+            sfxSource.PlayOneShot(clip);
+        }
     }
 
     // --- Networked Sounds ---
-    public void PlayGlobalSound(string clipName, Vector3 position)
+    public void PlayGlobalSound(string soundName, Vector3 position)
     {
-        PlaySoundServerRpc(clipName, position, SoundAudience.Global, default);
+        PlaySoundServerRpc(soundName, position, SoundAudience.Global, default);
     }
 
-    public void PlayTeamSound(string clipName, Vector3 position, Team team)
+    public void PlayTeamSound(string soundName, Vector3 position, Team team)
     {
-        PlaySoundServerRpc(clipName, position, SoundAudience.Team, team);
+        PlaySoundServerRpc(soundName, position, SoundAudience.Team, team);
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void PlaySoundServerRpc(string clipName, Vector3 position, SoundAudience audience, Team targetTeam)
+    private void PlaySoundServerRpc(string soundName, Vector3 position, SoundAudience audience, Team targetTeam)
     {
         ClientRpcParams clientRpcParams = default;
 
@@ -68,7 +84,7 @@ public class SoundManager : NetworkBehaviour
             var teamPlayers = GameManager.Instance.GetTeamPlayers(targetTeam);
             var clientIds = teamPlayers.Select(p => p.OwnerClientId).ToArray();
 
-            if (clientIds.Length == 0) return; // 팀원이 없으면 실행하지 않음
+            if (clientIds.Length == 0) return;
 
             clientRpcParams = new ClientRpcParams
             {
@@ -79,28 +95,15 @@ public class SoundManager : NetworkBehaviour
             };
         }
 
-        PlaySoundClientRpc(clipName, position, clientRpcParams);
+        PlaySoundClientRpc(soundName, position, clientRpcParams);
     }
 
     [ClientRpc]
-    private void PlaySoundClientRpc(string clipName, Vector3 position, ClientRpcParams clientRpcParams = default)
+    private void PlaySoundClientRpc(string soundName, Vector3 position, ClientRpcParams clientRpcParams = default)
     {
-        AudioClip clipToPlay = GetClipFromName(clipName);
-        if (clipToPlay != null)
+        if (soundDictionary.TryGetValue(soundName, out AudioClip clipToPlay))
         {
             AudioSource.PlayClipAtPoint(clipToPlay, position);
-        }
-    }
-
-    private AudioClip GetClipFromName(string clipName)
-    {
-        switch (clipName)
-        {
-            case "wardPlace": return wardPlaceSound;
-            case "wardDestroy": return wardDestroySound;
-            case "bulletFire": return bulletFireSound;
-            case "teamAlert": return teamAlertSound;
-            default: return null;
         }
     }
 
@@ -110,3 +113,4 @@ public class SoundManager : NetworkBehaviour
         Team
     }
 }
+

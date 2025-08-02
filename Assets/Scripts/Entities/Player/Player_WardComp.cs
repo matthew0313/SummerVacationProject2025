@@ -136,6 +136,7 @@ public class Player_WardComp : NetworkBehaviour
                     Ward ward = Instantiate(origin.wardPrefab, wardPreview.transform.position, Quaternion.identity);
                     ward.NetworkObject.Spawn();
                     ward.SetOwnerRpc(origin.origin);
+                    SoundManager.Instance.PlayGlobalSound("wardPlace", ward.transform.position); // 글로벌 사운드 재생
                     origin.wardsOwned--;
                     origin.wardPlaceCounter = origin.wardPlaceCooldown;
                     origin.AddWard(ward);
