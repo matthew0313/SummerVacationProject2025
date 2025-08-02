@@ -15,6 +15,7 @@ public class MyNetworkManager : MonoBehaviour
     {
         Instance = Instantiate(Resources.Load<MyNetworkManager>("MyNetworkManager"));
         DontDestroyOnLoad(Instance.gameObject);
+        Instantiate(Resources.Load<SoundManager>("SoundManager"));
     }
     
     NetworkManager networkManager;
