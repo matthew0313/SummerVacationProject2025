@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
@@ -11,15 +12,28 @@ public class Player_WardComp : NetworkBehaviour
     [SerializeField] WardPreview wardPreviewPrefab;
     [SerializeField] KeyCode wardPlaceKey = KeyCode.Q;
     [SerializeField] float m_wardPlaceCooldown = 5.0f, wardPlaceRange = 5.0f;
-    [SerializeField] int m_maxWards = 3;
+    [SerializeField] int m_maxWardsOwned = 10, m_maxWardsPlaced = 3;
     [SerializeField] LayerMask obstacleMask;
     public float wardPlaceCooldown => m_wardPlaceCooldown;
-    public int maxWards => m_maxWards;
-    public int wardOwned = 0;
+    public int maxWardsOwned => m_maxWardsOwned;
+    public int maxWardsPlaced => m_maxWardsPlaced;
+
+    [SerializeField] int m_wardsOwned = 0;
+    public int wardsOwned
+    {
+        get => m_wardsOwned;
+        set
+        {
+            m_wardsOwned = Mathf.Min(value, maxWardsOwned);
+            onWardsOwnedChange?.Invoke();
+        }
+    }
     public float wardPlaceCounter { get; private set; } = 0.0f;
 
-    List<Ward> wards = new();
+    public readonly List<Ward> wardsPlaced = new();
     TopLayer topLayer;
+
+    public event Action onWardsOwnedChange, onWardsPlacedChange;
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.blue;
@@ -53,7 +67,17 @@ public class Player_WardComp : NetworkBehaviour
             topLayer.OnStateExit();
         }
     }
-    bool canPlaceWard => wardPlaceCounter <= 0.0f && wardOwned > 0 && !isDead && wards.Count < maxWards;
+    public void AddWard(Ward ward)
+    {
+        wardsPlaced.Add(ward);
+        onWardsPlacedChange?.Invoke();
+    }
+    public void RemoveWard(Ward ward)
+    {
+        wardsPlaced.Remove(ward);
+        onWardsPlacedChange?.Invoke();
+    }
+    public bool canPlaceWard => wardPlaceCounter <= 0.0f && wardsOwned > 0 && !isDead && wardsPlaced.Count < maxWardsPlaced;
     class TopLayer : TopLayer<Player_WardComp>
     {
         public TopLayer(Player_WardComp origin) : base(origin)
@@ -112,8 +136,9 @@ public class Player_WardComp : NetworkBehaviour
                     Ward ward = Instantiate(origin.wardPrefab, wardPreview.transform.position, Quaternion.identity);
                     ward.NetworkObject.Spawn();
                     ward.SetOwnerRpc(origin.origin);
-                    origin.wardOwned--;
-                    origin.wards.Add(ward);
+                    origin.wardsOwned--;
+                    origin.wardPlaceCounter = origin.wardPlaceCooldown;
+                    origin.AddWard(ward);
                     parentLayer.ChangeState("Idle"); return;
                 }
             }

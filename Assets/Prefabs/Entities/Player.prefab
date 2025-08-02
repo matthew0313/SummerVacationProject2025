@@ -712,7 +712,7 @@ GameObject:
   - component: {fileID: 8017055718019536943}
   m_Layer: 6
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -814,11 +814,12 @@ MonoBehaviour:
   wardPlaceKey: 113
   m_wardPlaceCooldown: 5
   wardPlaceRange: 5
-  m_maxWards: 3
+  m_maxWardsOwned: 10
+  m_maxWardsPlaced: 3
   obstacleMask:
     serializedVersion: 2
     m_Bits: 8
-  wardOwned: 0
+  m_wardsOwned: 1
 --- !u!114 &5287047833319047997
 MonoBehaviour:
   m_ObjectHideFlags: 0

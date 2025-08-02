@@ -46,7 +46,11 @@ public class Ward : Entity, IDamagable
         yield return new WaitForSeconds(disappearTime);
         NetworkObject.Despawn();
     }
-
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+        owner.wardComp.RemoveWard(this);
+    }
     public enum WardType
     {
         Vision,
