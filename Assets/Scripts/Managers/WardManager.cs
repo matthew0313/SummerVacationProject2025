@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
+/*
 public class WardManager : NetworkBehaviour
 {
     [Header("Ward Management")]
@@ -290,4 +291,4 @@ public class WardManager : NetworkBehaviour
             }
         }
     }
-} 
+} */

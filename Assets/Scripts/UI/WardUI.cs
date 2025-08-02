@@ -3,9 +3,37 @@ using UnityEngine.UI;
 using TMPro;
 using Unity.Netcode;
 
-public class WardUI : MonoBehaviour
+public class WardUI : MonoBehaviour, ILocalPlayerSpawnCallback
 {
-    [Header("Ward Status")]
+    Player player;
+    [SerializeField] Animator anim;
+    [SerializeField] TMP_Text wardPlacedText, wardOwnedText;
+
+    public void OnLocalPlayerSpawn(Player localPlayer)
+    {
+        player = localPlayer;
+        player.wardComp.onWardsOwnedChange += OnWardsOwnedChange;
+        player.wardComp.onWardsPlacedChange += OnWardsPlacedChange;
+        OnWardsOwnedChange(); OnWardsPlacedChange();
+    }
+    readonly int canPlaceID = Animator.StringToHash("CanPlace");
+    readonly int cooldownFillID = Animator.StringToHash("CooldownFill");
+    private void Update()
+    {
+        if (player == null) return;
+        anim.SetBool(canPlaceID, player.wardComp.canPlaceWard);
+        anim.SetFloat(cooldownFillID, player.wardComp.wardPlaceCounter / player.wardComp.wardPlaceCooldown);
+    }
+    void OnWardsOwnedChange()
+    {
+        wardOwnedText.text = player.wardComp.wardsOwned.ToString();
+    }
+    void OnWardsPlacedChange()
+    {
+        wardPlacedText.text = $"{player.wardComp.wardsPlaced.Count}/{player.wardComp.maxWardsPlaced}";
+    }
+    #region old
+    /*[Header("Ward Status")]
     [SerializeField] private GameObject wardStatusPanel;
     [SerializeField] private Image wardCooldownImage;
     [SerializeField] private TextMeshProUGUI wardCountText;
@@ -218,5 +246,6 @@ public class WardUI : MonoBehaviour
             wardManager.OnWardDestroyed -= OnWardDestroyed;
             wardManager.OnWardCooldownChanged -= OnWardCooldownChanged;
         }
-    }
-} 
+    }*/
+    #endregion
+}
