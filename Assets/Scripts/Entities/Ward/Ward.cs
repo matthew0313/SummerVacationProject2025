@@ -1,5 +1,6 @@
 using System.Collections;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 
 public class Ward : Entity, IDamagable
@@ -17,6 +18,7 @@ public class Ward : Entity, IDamagable
     {
         if(owner.TryGet(out Player player))
         {
+            Debug.Log(Player.localPlayer.GetRelation(player));
             this.owner = player;
             anim.SetInteger(relationID, (int)Player.localPlayer.GetRelation(player));
         }
@@ -37,10 +39,12 @@ public class Ward : Entity, IDamagable
         if(wardHealth.Value <= 0)
         {
             dead = true;
-            anim.SetBool(deadID, true);
+            SetDeadRpc();
             StartCoroutine(Despawning());
         }
     }
+    [Rpc(SendTo.Everyone)]
+    public void SetDeadRpc() => anim.SetBool(deadID, true);
     IEnumerator Despawning()
     {
         yield return new WaitForSeconds(disappearTime);

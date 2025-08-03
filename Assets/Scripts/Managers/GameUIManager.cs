@@ -9,5 +9,8 @@ public class GameUIManager : MonoBehaviour
     public static GameUIManager Instance { get; private set; }
     public GameUIManager() => Instance = this;
 
-    [SerializeField] WardUI wardUI;
+    [SerializeField] WardUI m_wardUI;
+    [SerializeField] RoundTimerUI m_roundTimerUI;
+    public WardUI wardUI => m_wardUI;
+    public RoundTimerUI roundTimerUI => m_roundTimerUI;
 }

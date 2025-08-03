@@ -47,6 +47,8 @@ public class Player_WardComp : NetworkBehaviour
     {
         if (IsOwner)
         {
+            GameManager.Instance.onRoundStart += () => { wardsOwned = 0; };
+            GameManager.Instance.onRoundEnd += () => { wardsOwned = 0; };
             topLayer = new(this);
             topLayer.OnStateEnter();
         }
@@ -77,7 +79,7 @@ public class Player_WardComp : NetworkBehaviour
         wardsPlaced.Remove(ward);
         onWardsPlacedChange?.Invoke();
     }
-    public bool canPlaceWard => wardPlaceCounter <= 0.0f && wardsOwned > 0 && !isDead && wardsPlaced.Count < maxWardsPlaced;
+    public bool canPlaceWard => wardPlaceCounter <= 0.0f && wardsOwned > 0 && !isDead && wardsPlaced.Count < maxWardsPlaced && origin.PVP.Value;
     class TopLayer : TopLayer<Player_WardComp>
     {
         public TopLayer(Player_WardComp origin) : base(origin)
