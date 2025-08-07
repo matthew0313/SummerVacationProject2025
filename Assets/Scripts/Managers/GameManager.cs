@@ -19,18 +19,8 @@ public class GameManager : NetworkBehaviour
     [SerializeField] int roundTime = 300;
     [SerializeField] Transform teamRedSpawnpoint, teamBlueSpawnpoint;
 
-    public bool roundInProgress { get; private set; } = false;
-    [Rpc(SendTo.Everyone, AllowTargetOverride = true)]
-    public void SetRoundInProgressRpc(bool roundInProgress, RpcParams rpcParams = new())
-    {
-        this.roundInProgress = roundInProgress;
-        onRoundInProgressChange?.Invoke(roundInProgress);
-    }
-    public event Action<bool> onRoundInProgressChange;
-
-    public int timeLeft { get; private set; } = 30;
-    [Rpc(SendTo.Everyone, AllowTargetOverride = true)]
-    public void SetTimeLeftRpc(int timeLeft, RpcParams rpcParams = new()) => this.timeLeft = timeLeft;
+    public readonly NetworkVariable<bool> roundInProgress = new(false);
+    public readonly NetworkVariable<int> timeLeft = new(30);
 
     readonly List<Player> players = new();
     private void Start()
@@ -47,43 +37,28 @@ public class GameManager : NetworkBehaviour
     private void Update()
     {
         if (!HasAuthority) return;
-        counter += Time.deltaTime;
-        if(counter >= 1.0f)
+        if(timeLeft.Value > 0)
         {
-            if (timeLeft > 0) SetTimeLeftRpc(timeLeft - 1);
-            counter -= 1.0f;
-        }
-        if(timeLeft <= 0)
-        {
-            if (roundInProgress) EndRound();
-            else StartRound();
-        }
-    }
-    private void OnEnable()
-    {
-        NetworkManager.Singleton.OnConnectionEvent += OnConnectionEvent;
-    }
-    private void OnDisable()
-    {
-        NetworkManager.Singleton.OnConnectionEvent -= OnConnectionEvent;
-    }
-    void OnConnectionEvent(NetworkManager manager, ConnectionEventData data)
-    {
-        if (!HasAuthority) return;
-        if(data.EventType == ConnectionEvent.PeerConnected)
-        {
-            SetRoundInProgressRpc(roundInProgress, RpcTarget.Single(data.ClientId, RpcTargetUse.Temp));
-            SetTimeLeftRpc(timeLeft, RpcTarget.Single(data.ClientId, RpcTargetUse.Temp));
+            counter += Time.deltaTime;
+            if(counter >= 1.0f)
+            {
+                counter -= 1.0f;
+                if(--timeLeft.Value <= 0)
+                {
+                    if (roundInProgress.Value) EndRound();
+                    else StartRound();
+                }
+            }
         }
     }
     void StartRound()
     {
         if (players.Count < 2)
         {
-            SetTimeLeftRpc(intermissionTime); return;
+            timeLeft.Value = intermissionTime; return;
         }
-        SetRoundInProgressRpc(true);
-        SetTimeLeftRpc(roundTime);
+        roundInProgress.Value = true;
+        timeLeft.Value = roundTime;
         List<Player> playerCache = players.ToList();
         List<Player> teamRed = new();
         for(int i = 0; i < playerCache.Count / 2; i++)
@@ -112,11 +87,11 @@ public class GameManager : NetworkBehaviour
     public void RoundStartRpc() => onRoundStart?.Invoke();
     void EndRound()
     {
-        SetRoundInProgressRpc(false);
-        SetTimeLeftRpc(intermissionTime);
+        roundInProgress.Value = false;
+        timeLeft.Value = intermissionTime;
         foreach(var i in players)
         {
-            if (i.team.Value != Team.None)
+            if (i.PVP.Value)
             {
                 i.SetPVPRpc(false);
                 i.SetTeamRpc(Team.None);
