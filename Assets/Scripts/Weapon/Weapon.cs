@@ -3,7 +3,7 @@ using UnityEngine.InputSystem.Interactions;
 
 public abstract class Weapon : MonoBehaviour
 {
-    public GameObject owner; //Player
+    public Player owner;
     public Vector2 direction;
     void Update()
     {

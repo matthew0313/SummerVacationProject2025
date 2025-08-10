@@ -17,7 +17,11 @@ public class Player_WardComp : NetworkBehaviour
     public float wardPlaceCooldown => m_wardPlaceCooldown;
     public int maxWardsOwned => m_maxWardsOwned;
     public int maxWardsPlaced => m_maxWardsPlaced;
-    public int wardsOwned => origin.wards.Value;
+    public int wardsOwned
+    {
+        get => origin.inventory.ward;
+        set => origin.inventory.ward = value;
+    }
     public float wardPlaceCounter { get; private set; } = 0.0f;
 
     public readonly List<Ward> wardsPlaced = new();

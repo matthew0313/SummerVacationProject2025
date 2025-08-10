@@ -36,6 +36,8 @@ public class Player_Inventory : NetworkBehaviour
     }
 
     public event Action<int> onGasChange, onBoltChange, onWardChange, onPotion1Change, onPotion2Change;
+    public event Action<Weapon> onWeapon2Change;
+    public int slotIndex { get; private set; } = 0;
     private void Awake()
     {
         origin = GetComponent<Player>();
@@ -44,23 +46,28 @@ public class Player_Inventory : NetworkBehaviour
     {
         if (HasAuthority)
         {
-            GameManager.Instance.onRoundStart += OnRoundStart;
-            GameManager.Instance.onRoundEnd += OnRoundEnd;
+            GameManager.Instance.onRoundStart += ResetInventory;
+            GameManager.Instance.onRoundEnd += ResetInventory;
+            origin.hpComp.onDeath += OnDeath;
         }
     }
-    void OnRoundStart()
+    private void Update()
+    {
+        if (!HasAuthority) return;
+    }
+    void ResetInventory()
+    {
+        gas = 0; bolt = 0; ward = 0; potion1 = 0; potion2 = 0;
+    }
+    void OnDeath()
     {
 
     }
-    void OnRoundEnd()
+    [Rpc(SendTo.Authority)]
+    public void AddGasRpc(int amount) => gas += amount;
+    public void ChangeWeapon2(Weapon weapon)
     {
+        Weapon tmp = Instantiate(weapon, transform.position, transform.rotation);
 
     }
-
-    [Rpc(SendTo.Authority)]
-    public void SetGasRpc(int gas) => this.gas.Value = gas;
-    [Rpc(SendTo.Authority)]
-    public void SetBoltsRpc(int bolts) => this.bolts.Value = bolts;
-    [Rpc(SendTo.Authority)]
-    public void AddGasRpc(int amount) => this.gas.Value += amount;
 }
