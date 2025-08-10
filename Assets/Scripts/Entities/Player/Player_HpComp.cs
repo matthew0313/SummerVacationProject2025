@@ -5,14 +5,25 @@ using UnityEngine;
 public class Player_HpComp : HpComp
 {
     Player origin;
-    public override Entity entity => origin;
+    public override Entity owner => origin;
 
     [SerializeField] float respawnTime = 3.0f;
-    public Transform respawnPoint;
+    public Vector2 respawnPos = Vector2.zero;
+
+    [Rpc(SendTo.Owner)]
+    public void SetRespawnPosRpc(Vector2 respawnPos) => this.respawnPos = respawnPos;
     protected override void Awake()
     {
         base.Awake();
         origin = GetComponent<Player>();
+    }
+    private void Start()
+    {
+        if (HasAuthority)
+        {
+            GameManager.Instance.onRoundStart += ResetHp;
+            GameManager.Instance.onRoundEnd += ResetHp;
+        }
     }
     protected override void OnDeath()
     {
@@ -24,6 +35,6 @@ public class Player_HpComp : HpComp
         yield return new WaitForSeconds(respawnTime);
         isDead.Value = false;
         hp.Value = maxHp.Value;
-        origin.TeleportRpc(respawnPoint != null ? respawnPoint.position : Vector2.zero);
+        origin.TeleportRpc(respawnPos);
     }
 }

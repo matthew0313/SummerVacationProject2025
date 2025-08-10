@@ -1,15 +1,16 @@
 using System.Collections;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 
 public class Ward : Entity, IDamagable
 {
-    public Entity entity => this;
+    public Player owner { get; private set; }
+    Entity IRelationAffected.owner => owner;
 
     [SerializeField] Animator anim;
     [SerializeField] UnitTime disappearTime;
     public readonly NetworkVariable<int> wardHealth = new(3);
-    public Player owner { get; private set; }
 
     readonly int relationID = Animator.StringToHash("Relation");
     [Rpc(SendTo.ClientsAndHost)]
@@ -17,6 +18,7 @@ public class Ward : Entity, IDamagable
     {
         if(owner.TryGet(out Player player))
         {
+            Debug.Log(Player.localPlayer.GetRelation(player));
             this.owner = player;
             anim.SetInteger(relationID, (int)Player.localPlayer.GetRelation(player));
         }
@@ -37,11 +39,12 @@ public class Ward : Entity, IDamagable
         if(wardHealth.Value <= 0)
         {
             dead = true;
-            SoundManager.Instance.PlayGlobalSound("wardDestroy", transform.position);
-            anim.SetBool(deadID, true);
+            SetDeadRpc();
             StartCoroutine(Despawning());
         }
     }
+    [Rpc(SendTo.Everyone)]
+    public void SetDeadRpc() => anim.SetBool(deadID, true);
     IEnumerator Despawning()
     {
         yield return new WaitForSeconds(disappearTime);

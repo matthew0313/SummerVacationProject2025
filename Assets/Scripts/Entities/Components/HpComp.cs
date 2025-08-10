@@ -4,7 +4,7 @@ using UnityEngine;
 
 public abstract class HpComp : NetworkBehaviour, IDamagable
 {
-    public abstract Entity entity { get; }
+    public abstract Entity owner { get; }
 
     [SerializeField] float defaultHp = 100.0f;
 
@@ -14,15 +14,15 @@ public abstract class HpComp : NetworkBehaviour, IDamagable
     public event Action onHpChange, onDeath;
     public event Action<float> onDamage;
 
-    [Rpc(SendTo.Authority)]
-    public void ResetRpc()
+    protected void ResetHp()
     {
+        if (!HasAuthority) return;
         maxHp.Value = defaultHp;
         hp.Value = defaultHp;
     }
     protected virtual void Awake()
     {
-        if (HasAuthority) ResetRpc();
+        if (HasAuthority) ResetHp();
         maxHp.OnValueChanged += (prev, val) => onHpChange?.Invoke();
         hp.OnValueChanged += (prev, val) => onHpChange?.Invoke();
     }

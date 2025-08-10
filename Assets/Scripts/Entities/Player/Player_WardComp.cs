@@ -17,16 +17,10 @@ public class Player_WardComp : NetworkBehaviour
     public float wardPlaceCooldown => m_wardPlaceCooldown;
     public int maxWardsOwned => m_maxWardsOwned;
     public int maxWardsPlaced => m_maxWardsPlaced;
-
-    [SerializeField] int m_wardsOwned = 0;
     public int wardsOwned
     {
-        get => m_wardsOwned;
-        set
-        {
-            m_wardsOwned = Mathf.Min(value, maxWardsOwned);
-            onWardsOwnedChange?.Invoke();
-        }
+        get => origin.inventory.ward;
+        set => origin.inventory.ward = value;
     }
     public float wardPlaceCounter { get; private set; } = 0.0f;
 
@@ -77,7 +71,7 @@ public class Player_WardComp : NetworkBehaviour
         wardsPlaced.Remove(ward);
         onWardsPlacedChange?.Invoke();
     }
-    public bool canPlaceWard => wardPlaceCounter <= 0.0f && wardsOwned > 0 && !isDead && wardsPlaced.Count < maxWardsPlaced;
+    public bool canPlaceWard => wardPlaceCounter <= 0.0f && wardsOwned > 0 && !isDead && wardsPlaced.Count < maxWardsPlaced && origin.PVP.Value;
     class TopLayer : TopLayer<Player_WardComp>
     {
         public TopLayer(Player_WardComp origin) : base(origin)
