@@ -17,17 +17,7 @@ public class Player_WardComp : NetworkBehaviour
     public float wardPlaceCooldown => m_wardPlaceCooldown;
     public int maxWardsOwned => m_maxWardsOwned;
     public int maxWardsPlaced => m_maxWardsPlaced;
-
-    [SerializeField] int m_wardsOwned = 0;
-    public int wardsOwned
-    {
-        get => m_wardsOwned;
-        set
-        {
-            m_wardsOwned = Mathf.Min(value, maxWardsOwned);
-            onWardsOwnedChange?.Invoke();
-        }
-    }
+    public int wardsOwned => origin.wards.Value;
     public float wardPlaceCounter { get; private set; } = 0.0f;
 
     public readonly List<Ward> wardsPlaced = new();
@@ -47,8 +37,6 @@ public class Player_WardComp : NetworkBehaviour
     {
         if (IsOwner)
         {
-            GameManager.Instance.onRoundStart += () => { wardsOwned = 0; };
-            GameManager.Instance.onRoundEnd += () => { wardsOwned = 0; };
             topLayer = new(this);
             topLayer.OnStateEnter();
         }

@@ -5,12 +5,13 @@ using UnityEngine;
 using static UnityEngine.UI.Image;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(NetworkTransform), typeof(NetworkRigidbody2D))]
-[RequireComponent(typeof(Player_HpComp), typeof(Player_WardComp))]
+[RequireComponent(typeof(Player_HpComp), typeof(Player_WardComp), typeof(Player_Inventory))]
 public class Player : Entity
 {
     public static Player localPlayer;
     public Player_HpComp hpComp { get; private set; }
     public Player_WardComp wardComp { get; private set; }
+    public Player_Inventory inventory { get; private set; }
 
     Rigidbody2D rb;
     Camera mainCam;
@@ -21,17 +22,15 @@ public class Player : Entity
     [SerializeField] float moveSpeed = 5.0f;
     [SerializeField] Transform rotator, flipped;
 
+    [Header("Potions")]
+    [SerializeField] KeyCode potionUseKey;
+
     public readonly NetworkVariable<Team> team = new(Team.None);
     public readonly NetworkVariable<bool> PVP = new(false);
-    public readonly NetworkVariable<int> gas = new(0), bolts = new(0);
     [Rpc(SendTo.Authority)]
     public void SetTeamRpc(Team team) => this.team.Value = team;
     [Rpc(SendTo.Authority)]
     public void SetPVPRpc(bool PVP) => this.PVP.Value = PVP;
-    [Rpc(SendTo.Authority)]
-    public void SetGasRpc(int gas) => this.gas.Value = gas;
-    [Rpc(SendTo.Authority)]
-    public void SetBoltsRpc(int bolts) => this.bolts.Value = bolts;
     bool isDead => hpComp.isDead.Value;
     TopLayer topLayer;
 
@@ -39,6 +38,7 @@ public class Player : Entity
     {
         hpComp = GetComponent<Player_HpComp>();
         wardComp = GetComponent<Player_WardComp>();
+        inventory = GetComponent<Player_Inventory>();
         rb = GetComponent<Rigidbody2D>();
         mainCam = Camera.main;
     }
