@@ -5,12 +5,12 @@ using UnityEngine;
 
 public class Ward : Entity, IDamagable
 {
-    public Entity entity => this;
+    public Player owner { get; private set; }
+    Entity IRelationAffected.owner => owner;
 
     [SerializeField] Animator anim;
     [SerializeField] UnitTime disappearTime;
     public readonly NetworkVariable<int> wardHealth = new(3);
-    public Player owner { get; private set; }
 
     readonly int relationID = Animator.StringToHash("Relation");
     [Rpc(SendTo.ClientsAndHost)]

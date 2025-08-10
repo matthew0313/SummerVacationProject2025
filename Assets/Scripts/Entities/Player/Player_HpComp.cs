@@ -5,7 +5,7 @@ using UnityEngine;
 public class Player_HpComp : HpComp
 {
     Player origin;
-    public override Entity entity => origin;
+    public override Entity owner => origin;
 
     [SerializeField] float respawnTime = 3.0f;
     public Vector2 respawnPos = Vector2.zero;

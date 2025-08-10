@@ -22,7 +22,7 @@ public class GameManager : NetworkBehaviour
     public readonly NetworkVariable<bool> roundInProgress = new(false);
     public readonly NetworkVariable<int> timeLeft = new(30);
 
-    readonly List<Player> players = new();
+    public readonly List<Player> players = new();
     private void Start()
     {
         var player = Instantiate(playerPrefab);

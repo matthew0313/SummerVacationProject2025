@@ -4,7 +4,7 @@ using UnityEngine;
 
 public abstract class HpComp : NetworkBehaviour, IDamagable
 {
-    public abstract Entity entity { get; }
+    public abstract Entity owner { get; }
 
     [SerializeField] float defaultHp = 100.0f;
 

@@ -23,6 +23,15 @@ public class Player : Entity
 
     public readonly NetworkVariable<Team> team = new(Team.None);
     public readonly NetworkVariable<bool> PVP = new(false);
+    public readonly NetworkVariable<int> gas = new(0), bolts = new(0);
+    [Rpc(SendTo.Authority)]
+    public void SetTeamRpc(Team team) => this.team.Value = team;
+    [Rpc(SendTo.Authority)]
+    public void SetPVPRpc(bool PVP) => this.PVP.Value = PVP;
+    [Rpc(SendTo.Authority)]
+    public void SetGasRpc(int gas) => this.gas.Value = gas;
+    [Rpc(SendTo.Authority)]
+    public void SetBoltsRpc(int bolts) => this.bolts.Value = bolts;
     bool isDead => hpComp.isDead.Value;
     TopLayer topLayer;
 
@@ -74,11 +83,6 @@ public class Player : Entity
         base.OnDestroy();
         if (IsOwner) topLayer.OnStateExit();
     }
-
-    [Rpc(SendTo.Authority)]
-    public void SetTeamRpc(Team team) => this.team.Value = team;
-    [Rpc(SendTo.Authority)]
-    public void SetPVPRpc(bool PVP) => this.PVP.Value = PVP;
 
     public Relation GetRelation(Entity other)
     {

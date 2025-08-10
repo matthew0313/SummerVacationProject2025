@@ -29,6 +29,20 @@ public class SessionManager : MonoBehaviour
         DontDestroyOnLoad(this);
     }
     public Action onSignIn;
+    public bool signedIn { get; private set; } = false;
+    public string playerName
+    {
+        get
+        {
+            string tmp = AuthenticationService.Instance.PlayerName;
+            tmp = tmp.Substring(0, tmp.IndexOf('#'));
+            return tmp;
+        }
+        set
+        {
+            AuthenticationService.Instance.UpdatePlayerNameAsync(value);
+        }
+    }
     async void Start()
     {
         try
@@ -37,6 +51,7 @@ public class SessionManager : MonoBehaviour
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
             Debug.Log($"Player: {AuthenticationService.Instance.PlayerName}");
             onSignIn?.Invoke();
+            signedIn = true;
         }
         catch(Exception e)
         {

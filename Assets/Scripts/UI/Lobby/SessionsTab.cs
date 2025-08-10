@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using TMPro;
 using Unity.VisualScripting;
 using DG.Tweening;
+using Unity.Services.Authentication;
 
 public class SessionsTab : Tab
 {
@@ -14,6 +15,9 @@ public class SessionsTab : Tab
     [Header("Session List")]
     [SerializeField] SessionListUI sessionList;
     [SerializeField] Button refreshButton;
+
+    [Header("Player Name")]
+    [SerializeField] TMP_InputField playerNameField;
 
     [Header("Tween")]
     [SerializeField] RectTransform tweenTarget;
@@ -46,14 +50,25 @@ public class SessionsTab : Tab
         sessionID.onValueChanged.AddListener(OnIDValueChanged);
         joinOrStartSessionButton.onClick.AddListener(JoinOrStartSession);
         startSessionButton.onClick.AddListener(StartSession);
+        refreshButton.onClick.AddListener(sessionList.Refresh);
+
+        SessionManager.Instance.onSignIn += OnSignIn;
+        if (SessionManager.Instance.signedIn) playerNameField.text = SessionManager.Instance.playerName;
+        playerNameField.onEndEdit.AddListener(OnPlayerNameChange);
     }
     private void OnDisable()
     {
         sessionID.onValueChanged.RemoveListener(OnIDValueChanged);
         joinOrStartSessionButton.onClick.RemoveListener(JoinOrStartSession);
         startSessionButton.onClick.RemoveListener(StartSession);
+        refreshButton.onClick.RemoveListener(sessionList.Refresh);
+
+        SessionManager.Instance.onSignIn -= OnSignIn;
+        playerNameField.onEndEdit.RemoveListener(OnPlayerNameChange);
     }
     void OnIDValueChanged(string value) => joinOrStartSessionButton.interactable = value != string.Empty;
     void JoinOrStartSession() => SessionManager.Instance.JoinOrStartSession(sessionID.text);
     void StartSession() => SessionManager.Instance.StartSession();
+    void OnSignIn() => playerNameField.text = SessionManager.Instance.playerName;
+    void OnPlayerNameChange(string text) => SessionManager.Instance.playerName = text;
 }

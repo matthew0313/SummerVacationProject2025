@@ -1,8 +1,7 @@
 using Unity.Netcode;
 using UnityEngine;
 
-public interface IDamagable
+public interface IDamagable : IRelationAffected
 {
-    public Entity entity { get; }
     public void GetDamage(float damage);
 }
