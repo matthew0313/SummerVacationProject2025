@@ -21,8 +21,8 @@ public class Player_HpComp : HpComp
     {
         if (HasAuthority)
         {
-            GameManager.Instance.onRoundStart += () => { ResetHp(); };
-            GameManager.Instance.onRoundEnd += () => { ResetHp(); };
+            GameManager.Instance.onRoundStart += ResetHp;
+            GameManager.Instance.onRoundEnd += ResetHp;
         }
     }
     protected override void OnDeath()
