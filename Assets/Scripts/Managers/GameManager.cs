@@ -66,7 +66,8 @@ public class GameManager : NetworkBehaviour
         timeLeft.Value = roundTime;
         List<Player> playerCache = players.ToList();
         List<Player> teamRed = new();
-        for(int i = 0; i < playerCache.Count / 2; i++)
+        int tmp = playerCache.Count;
+        for(int i = 0; i < tmp / 2; i++)
         {
             Player player = playerCache[UnityEngine.Random.Range(0, playerCache.Count)];
             teamRed.Add(player);
