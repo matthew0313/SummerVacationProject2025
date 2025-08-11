@@ -2,21 +2,23 @@ using System.Linq;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using static UnityEngine.UI.Image;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(NetworkTransform), typeof(NetworkRigidbody2D))]
 [RequireComponent(typeof(Player_HpComp), typeof(Player_WardComp), typeof(Player_Inventory))]
+[RequireComponent(typeof(Player_Animations))]
 public class Player : Entity
 {
     public static Player localPlayer;
     public Player_HpComp hpComp { get; private set; }
     public Player_WardComp wardComp { get; private set; }
     public Player_Inventory inventory { get; private set; }
-
-    Rigidbody2D rb;
-    Camera mainCam;
+    public Player_Animations animations { get; private set; }
 
     public Animator anim;
+    Rigidbody2D rb;
+    Camera mainCam;
 
     [Header("Movements")]
     [SerializeField] float moveSpeed = 5.0f;
@@ -38,6 +40,7 @@ public class Player : Entity
         hpComp = GetComponent<Player_HpComp>();
         wardComp = GetComponent<Player_WardComp>();
         inventory = GetComponent<Player_Inventory>();
+        animations = GetComponent<Player_Animations>();
         rb = GetComponent<Rigidbody2D>();
         mainCam = Camera.main;
     }
@@ -114,7 +117,7 @@ public class Player : Entity
             rotator.localScale = new Vector3(1.0f, -1.0f, 1.0f);
         }
     }
-    Vector2 MoveInput() => new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
+    Vector2 MoveInput() => InputManager.Instance.MoveInput();
     class TopLayer : TopLayer<Player>
     {
         public TopLayer(Player origin) : base(origin)
@@ -141,6 +144,11 @@ public class Player : Entity
         class Moving : State<Player>
         {
             public Moving(Player origin, Layer<Player> parent) : base(origin, parent) { }
+            public override void OnStateEnter()
+            {
+                base.OnStateEnter();
+                origin.animations.isWalking.Value = true;
+            }
             public override void OnStateUpdate()
             {
                 base.OnStateUpdate();
@@ -150,14 +158,29 @@ public class Player : Entity
                 }
                 origin.rb.linearVelocity = origin.MoveInput() * origin.moveSpeed;
             }
+            public override void OnStateExit()
+            {
+                base.OnStateExit();
+                origin.animations.isWalking.Value = false;
+            }
         }
         class Dead : State<Player>
         {
             public Dead(Player origin, Layer<Player> parent) : base(origin, parent) { }
+            public override void OnStateEnter()
+            {
+                base.OnStateEnter();
+                origin.animations.isDead.Value = true;
+            }
             public override void OnStateUpdate()
             {
                 base.OnStateUpdate();
                 if (!origin.isDead) parentLayer.ChangeState("Idle");
+            }
+            public override void OnStateExit()
+            {
+                base.OnStateExit();
+                origin.animations.isDead.Value = false;
             }
         }
     }

@@ -27,21 +27,41 @@ public abstract class HpComp : NetworkBehaviour, IDamagable
         hp.OnValueChanged += (prev, val) => onHpChange?.Invoke();
     }
 
-    public void GetDamage(float damage) => GetDamageRpc(damage);
+    public void GetDamage(DamageInfo damage) => GetDamageRpc(damage);
 
     [Rpc(SendTo.Authority)]
-    public void GetDamageRpc(float damage) => ProcessDamage(damage);
-    protected virtual void ProcessDamage(float damage)
+    public void GetDamageRpc(DamageInfo damage)
     {
-        if (isDead.Value) return;
-        hp.Value = Mathf.Max(hp.Value - damage, 0);
-        onDamage?.Invoke(damage);
+        ProcessDamage(damage);
+    }
+    protected virtual DamageReceivedInfo ProcessDamage(DamageInfo damage)
+    {
+        DamageReceivedInfo info = new() { damageInfo = damage };
+        if (isDead.Value)
+        {
+            info.isNullified = true;
+            return info;
+        }
+        hp.Value = Mathf.Max(hp.Value - damage.amount, 0);
+        onDamage?.Invoke(damage.amount);
         if (hp.Value <= 0.0f)
         {
             isDead.Value = true;
             onDeath?.Invoke();
             OnDeath();
         }
+        return info;
     }
     protected virtual void OnDeath() { }
+}
+[System.Serializable]
+public struct DamageReceivedInfo : INetworkSerializable
+{
+    public DamageInfo damageInfo;
+    public bool isNullified;
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeNetworkSerializable(ref damageInfo);
+        serializer.SerializeValue(ref isNullified);
+    }
 }

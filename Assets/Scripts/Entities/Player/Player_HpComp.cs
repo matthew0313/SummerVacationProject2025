@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
@@ -25,6 +26,15 @@ public class Player_HpComp : HpComp
             GameManager.Instance.onRoundEnd += ResetHp;
         }
     }
+    protected override DamageReceivedInfo ProcessDamage(DamageInfo damage)
+    {
+        var info = base.ProcessDamage(damage);
+        if (!info.isNullified)
+        {
+            origin.animations.TriggerDamageRpc();
+        }
+        return info;
+    }
     readonly int deadID = Animator.StringToHash("Dead");
     protected override void OnDeath()
     {
@@ -32,6 +42,7 @@ public class Player_HpComp : HpComp
         origin.anim.SetBool(deadID, true);
         StartCoroutine(Respawning());
     }
+    public event Action onRespawn;
     IEnumerator Respawning()
     {
         yield return new WaitForSeconds(respawnTime);
@@ -39,5 +50,6 @@ public class Player_HpComp : HpComp
         hp.Value = maxHp.Value;
         origin.anim.SetBool(deadID, false);
         origin.TeleportRpc(respawnPos);
+        onRespawn?.Invoke();
     }
 }

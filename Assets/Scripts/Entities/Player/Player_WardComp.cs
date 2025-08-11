@@ -10,7 +10,6 @@ public class Player_WardComp : NetworkBehaviour
 
     [SerializeField] Ward wardPrefab;
     [SerializeField] WardPreview wardPreviewPrefab;
-    [SerializeField] KeyCode wardPlaceKey = KeyCode.Q;
     [SerializeField] float m_wardPlaceCooldown = 5.0f, wardPlaceRange = 5.0f;
     [SerializeField] int m_maxWardsOwned = 10, m_maxWardsPlaced = 3;
     [SerializeField] LayerMask obstacleMask;
@@ -43,6 +42,14 @@ public class Player_WardComp : NetworkBehaviour
         {
             topLayer = new(this);
             topLayer.OnStateEnter();
+            GameManager.Instance.onRoundEnd += () =>
+            {
+                foreach (var i in wardsPlaced)
+                {
+                    i.NetworkObject.Despawn();
+                }
+                wardsPlaced.Clear();
+            };
         }
     }
     private void Update()

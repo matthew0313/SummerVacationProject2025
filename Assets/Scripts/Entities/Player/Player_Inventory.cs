@@ -52,6 +52,7 @@ public class Player_Inventory : NetworkBehaviour
             GameManager.Instance.onRoundStart += ResetInventory;
             GameManager.Instance.onRoundEnd += ResetInventory;
             origin.hpComp.onDeath += OnDeath;
+            origin.hpComp.onRespawn += OnRespawn;
 
             Spear knife = Instantiate(knifePrefab);
             knife.NetworkObject.Spawn();
@@ -72,10 +73,12 @@ public class Player_Inventory : NetworkBehaviour
             slots[slotIndex].OnSlotEquip();
         }
     }
+    bool isDead => origin.hpComp.isDead.Value;
     private void Update()
     {
-        if (!HasAuthority) return;
-        for(int i = 0; i < slotCount; i++)
+        if (!HasAuthority || isDead) return;
+        slots[slotIndex].OnSlotUpdate();
+        for (int i = 0; i < slotCount; i++)
         {
             if (Input.GetKeyDown(KeyCode.Alpha1 + i))
             {
@@ -91,7 +94,11 @@ public class Player_Inventory : NetworkBehaviour
     }
     void OnDeath()
     {
-
+        slots[slotIndex].OnSlotUnequip();
+    }
+    void OnRespawn()
+    {
+        slots[slotIndex].OnSlotEquip();
     }
     void ChangeSlot(int index)
     {
@@ -128,11 +135,9 @@ public class Player_Inventory : NetworkBehaviour
         public event Action<Weapon> onWeaponChange;
         public void SetWeapon(Weapon weapon)
         {
-            Weapon oldWeapon = this.weapon;
             this.weapon = weapon;
             if (weapon != null) weapon.owner = inventory.origin;
             onWeaponChange?.Invoke(weapon);
-            if (oldWeapon != null) oldWeapon.NetworkObject.Despawn();
         }
         public override void OnSlotEquip()
         {

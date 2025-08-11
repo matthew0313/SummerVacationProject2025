@@ -32,6 +32,11 @@ public class GameManager : NetworkBehaviour
     }
     public void AddPlayer(Player player) => players.Add(player);
     public void RemovePlayer(Player player) => players.Remove(player);
+    public Player GetPlayer(ulong clientID)
+    {
+        foreach (var i in players) if (i.OwnerClientId == clientID) return i;
+        return null;
+    }
 
     float counter = 0.0f;
     private void Update()

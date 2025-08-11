@@ -23,6 +23,6 @@ public class GameUIManager : TabOpener
     public InventoryUI inventoryUI => m_inventoryUI;
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape)) CloseTab();
+        if (InputManager.Instance.EscapeInput()) CloseTab();
     }
 }

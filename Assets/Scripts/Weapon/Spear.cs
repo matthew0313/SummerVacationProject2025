@@ -30,11 +30,15 @@ public class Spear : Weapon
     {
         if (!IsOwner) return;
         GameObject hitObject = other.attachedRigidbody != null ? other.attachedRigidbody.gameObject : other.gameObject;
+        if (hits.Contains(hitObject)) return;
+        else hits.Add(hitObject);
 
-        if (hitObject.TryGetComponent(out IDamagable damagable) &&
-            (owner.GetRelation(damagable.owner) == Relation.Enemy || damagable is Ward ward && ward.owner == owner))
+        if (hitObject.TryGetComponent(out IDamagable damagable))
         {
-            damagable.GetDamage(damage);
+            if (owner.GetRelation(damagable.owner) == Relation.Enemy || damagable is Ward ward && ward.owner == owner)
+            {
+                damagable.GetDamage(new() { amount = damage, damageGiverClientID = OwnerClientId });
+            }
         }
     }
 }

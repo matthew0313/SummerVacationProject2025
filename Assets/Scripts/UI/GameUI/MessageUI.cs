@@ -5,6 +5,7 @@ using Unity.Netcode;
 using Unity.Collections;
 using Unity.Services.Authentication;
 using System.Collections.Generic;
+using UnityEngine.EventSystems;
 
 public class MessageUI : MonoBehaviour
 {
@@ -13,20 +14,26 @@ public class MessageUI : MonoBehaviour
     [SerializeField] Transform messageTextAnchor;
 
     readonly List<TMP_Text> messageTexts = new();
-    private void OnEnable()
+
+    private void Awake()
     {
         inputField.onSubmit.AddListener(OnSubmit);
+        inputField.onSelect.AddListener(text => InputManager.Instance.inputEnabled = false);
+        inputField.onDeselect.AddListener(text => InputManager.Instance.inputEnabled = true);
+    }
+    private void OnEnable()
+    {
         MessageManager.Instance.onMessageAdd += OnMessageAdd;
     }
 
     private void OnDisable()
     {
-        inputField.onEndEdit.RemoveListener(OnSubmit);
         MessageManager.Instance.onMessageAdd -= OnMessageAdd;
     }
     void OnSubmit(string msg)
     {
         inputField.text = string.Empty;
+        EventSystem.current.SetSelectedGameObject(null);
         if (msg != string.Empty)
         {
             if (msg.StartsWith("/t "))

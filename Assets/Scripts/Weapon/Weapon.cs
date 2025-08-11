@@ -6,6 +6,7 @@ public abstract class Weapon : NetworkBehaviour
 {
     public readonly NetworkVariable<bool> active = new(true);
 
+    [SerializeField] float holdDistance = 1.5f;
     public Sprite weaponSprite;
     public Player owner;
    
@@ -31,7 +32,7 @@ public abstract class Weapon : NetworkBehaviour
 
         transform.rotation = Quaternion.Euler(0, 0, angle);
 
-        Vector3 holdPosition = new Vector3(owner.transform.position.x + direction.x * 1.5f, owner.transform.position.y + direction.y * 1.5f, owner.transform.position.z);
+        Vector3 holdPosition = (Vector2)owner.transform.position + direction * holdDistance;
         FixDistance(holdPosition);
 
         if (Trigger())
@@ -68,8 +69,5 @@ public abstract class Weapon : NetworkBehaviour
         
     }
 
-    public virtual bool Trigger()
-    {
-        return Input.GetMouseButtonDown(0) && UIScanner.ScanUI(Input.mousePosition).Count <= 0; 
-    }
+    public virtual bool Trigger() => InputManager.Instance.ItemUseInput();
 }

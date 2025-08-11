@@ -24,7 +24,7 @@ public class Ward : Entity, IDamagable
         }
     }
 
-    public void GetDamage(float damage)
+    public void GetDamage(DamageInfo damage)
     {
         GetDamageRpc();
     }
@@ -35,6 +35,7 @@ public class Ward : Entity, IDamagable
     {
         if (dead) return;
         wardHealth.Value = Mathf.Max(wardHealth.Value - 1, 0);
+        TriggerDamageRpc();
         if(wardHealth.Value <= 0)
         {
             dead = true;

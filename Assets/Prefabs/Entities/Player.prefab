@@ -618,6 +618,7 @@ GameObject:
   - component: {fileID: 212841786362091563}
   - component: {fileID: 4438091874343390211}
   - component: {fileID: 2186205539621042158}
+  - component: {fileID: 575728927871163107}
   - component: {fileID: 5287047833319047997}
   - component: {fileID: 3206386267501458294}
   - component: {fileID: 4944495846888300931}
@@ -667,7 +668,7 @@ MonoBehaviour:
   GlobalObjectIdHash: 138618184
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
-  Ownership: 1
+  Ownership: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -755,12 +756,28 @@ MonoBehaviour:
   slot2WeaponPrefabs:
   - {fileID: 8132637147219163852, guid: ac438dca1f1309547affc1912811f5b2, type: 3}
   - {fileID: 3606478749056955178, guid: 9e68eec69c7020745843357872bc0752, type: 3}
+  m_maxWards: 3
+  m_maxPotion1: 5
+  m_maxPotion2: 5
   ward: 0
   potion1: 0
   potion2: 0
   mortarUnlocked: 0
   pistolBullets: 0
   rifleBullets: 0
+--- !u!114 &575728927871163107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3880763020959147649}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e68aae0d157f40f42a31e4914c361df1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!114 &5287047833319047997
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1046,7 +1063,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: -1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6245340417952150881}
@@ -1095,7 +1112,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Sprite: {fileID: 1997776128881171832, guid: 76a43798a51a04b058d7bca8796f33d3, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

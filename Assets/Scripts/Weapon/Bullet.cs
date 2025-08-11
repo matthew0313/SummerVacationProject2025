@@ -27,7 +27,7 @@ public class Bullet : NetworkBehaviour
 
         if (hitObject.TryGetComponent(out IDamagable damagable))
         {
-            if (Player.localPlayer.GetRelation(damagable.owner) == Relation.Enemy) damagable.GetDamage(damage);
+            if (Player.localPlayer.GetRelation(damagable.owner) == Relation.Enemy) damagable.GetDamage(new() { amount = damage, damageGiverClientID = OwnerClientId });
             else return;
         }
         NetworkObject.Despawn();

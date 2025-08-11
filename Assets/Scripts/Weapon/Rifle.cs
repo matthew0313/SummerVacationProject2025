@@ -8,8 +8,5 @@ public class Rifle : Gun
         set => owner.inventory.rifleBullets = value;
     }
 
-    public override bool Trigger()
-    {
-        return Input.GetMouseButton(0) && UIScanner.ScanUI(Input.mousePosition).Count <= 0;
-    }
+    public override bool Trigger() => InputManager.Instance.ItemUseHoldInput();
 }
