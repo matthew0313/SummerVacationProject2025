@@ -30,7 +30,6 @@ public class Ward : Entity, IDamagable
     }
 
     bool dead = false;
-    readonly int deadID = Animator.StringToHash("Dead");
     [Rpc(SendTo.Owner)]
     public void GetDamageRpc()
     {
@@ -43,8 +42,12 @@ public class Ward : Entity, IDamagable
             StartCoroutine(Despawning());
         }
     }
+    readonly int deadID = Animator.StringToHash("Dead");
     [Rpc(SendTo.Everyone)]
     public void SetDeadRpc() => anim.SetBool(deadID, true);
+    readonly int damageID = Animator.StringToHash("Damage");
+    [Rpc(SendTo.Everyone)]
+    public void TriggerDamageRpc() => anim.SetTrigger(damageID);
     IEnumerator Despawning()
     {
         yield return new WaitForSeconds(disappearTime);

@@ -71,7 +71,8 @@ public class Player_WardComp : NetworkBehaviour
         wardsPlaced.Remove(ward);
         onWardsPlacedChange?.Invoke();
     }
-    public bool canPlaceWard => wardPlaceCounter <= 0.0f && wardsOwned > 0 && !isDead && wardsPlaced.Count < maxWardsPlaced && origin.PVP.Value;
+    public bool canEnterPlaceMode => wardsOwned > 0 && !isDead && origin.inRound.Value;
+    public bool wardPlaceMode = false;
     class TopLayer : TopLayer<Player_WardComp>
     {
         public TopLayer(Player_WardComp origin) : base(origin)
@@ -86,7 +87,7 @@ public class Player_WardComp : NetworkBehaviour
             public override void OnStateUpdate()
             {
                 base.OnStateUpdate();
-                if (origin.canPlaceWard && Input.GetKeyDown(origin.wardPlaceKey))
+                if (origin.wardPlaceMode && origin.canEnterPlaceMode)
                 {
                     parentLayer.ChangeState("Placing"); return;
                 }
@@ -111,13 +112,14 @@ public class Player_WardComp : NetworkBehaviour
             public override void OnStateUpdate()
             {
                 base.OnStateUpdate();
-                if (!origin.canPlaceWard)
+                if (!origin.wardPlaceMode || !origin.canEnterPlaceMode)
                 {
                     parentLayer.ChangeState("Idle"); return;
                 }
                 Vector2 mousePos = mainCam.ScreenToWorldPoint(Input.mousePosition);
                 wardPreview.transform.position = mousePos;
                 bool canPlace =
+                    origin.wardsPlaced.Count < origin.maxWardsPlaced && 
                     !wardPreview.isObstructed &&
                     Vector2.Distance(origin.transform.position, mousePos) < origin.wardPlaceRange &&
                     !Physics2D.Raycast(

@@ -25,9 +25,11 @@ public class Player_HpComp : HpComp
             GameManager.Instance.onRoundEnd += ResetHp;
         }
     }
+    readonly int deadID = Animator.StringToHash("Dead");
     protected override void OnDeath()
     {
         base.OnDeath();
+        origin.anim.SetBool(deadID, true);
         StartCoroutine(Respawning());
     }
     IEnumerator Respawning()
@@ -35,6 +37,7 @@ public class Player_HpComp : HpComp
         yield return new WaitForSeconds(respawnTime);
         isDead.Value = false;
         hp.Value = maxHp.Value;
+        origin.anim.SetBool(deadID, false);
         origin.TeleportRpc(respawnPos);
     }
 }

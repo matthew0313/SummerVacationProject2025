@@ -80,26 +80,33 @@ public class GameManager : NetworkBehaviour
             i.hpComp.SetRespawnPosRpc(teamBlueSpawnpoint.position);
             i.TeleportRpc(teamBlueSpawnpoint.position);
         }
-        foreach (var i in players) i.SetPVPRpc(true);
+        foreach (var i in players)
+        {
+            i.SetPVPRpc(true);
+            i.SetInRoundRpc(true);
+        }
+        OnRoundStartRpc();
     }
     public event Action onRoundStart, onRoundEnd;
     [Rpc(SendTo.ClientsAndHost)]
-    public void RoundStartRpc() => onRoundStart?.Invoke();
+    public void OnRoundStartRpc() => onRoundStart?.Invoke();
     void EndRound()
     {
         roundInProgress.Value = false;
         timeLeft.Value = intermissionTime;
         foreach(var i in players)
         {
-            if (i.PVP.Value)
+            if (i.inRound.Value)
             {
                 i.SetPVPRpc(false);
+                i.SetInRoundRpc(false);
                 i.SetTeamRpc(Team.None);
                 i.hpComp.SetRespawnPosRpc(lobbySpawnPoint.position);
                 i.TeleportRpc(lobbySpawnPoint.position);
             }
         }
+        OnRoundEndRpc();
     }
     [Rpc(SendTo.ClientsAndHost)]
-    public void RoundEndRpc() => onRoundEnd?.Invoke();
+    public void OnRoundEndRpc() => onRoundEnd?.Invoke();
 }

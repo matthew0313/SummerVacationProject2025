@@ -8,7 +8,8 @@ using Unity.Netcode;
 
 public class TabOpener : MonoBehaviour
 {
-    Tab currentTab;
+    public bool isTabOpen => currentTab != null;
+    public Tab currentTab { get; private set; }
     public void OpenTab(Tab tab)
     {
         if (currentTab == tab)

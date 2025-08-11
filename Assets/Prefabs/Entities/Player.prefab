@@ -704,6 +704,7 @@ GameObject:
   - component: {fileID: 908334110077406541}
   - component: {fileID: 212841786362091563}
   - component: {fileID: 4438091874343390211}
+  - component: {fileID: 2186205539621042158}
   - component: {fileID: 5287047833319047997}
   - component: {fileID: 3206386267501458294}
   - component: {fileID: 4944495846888300931}
@@ -780,6 +781,7 @@ MonoBehaviour:
   moveSpeed: 5
   rotator: {fileID: 2456065049901013881}
   flipped: {fileID: 6245340417952150881}
+  potionUseKey: 0
 --- !u!114 &212841786362091563
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -795,7 +797,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   defaultHp: 100
   respawnTime: 3
-  respawnPoint: {fileID: 0}
+  respawnPos: {x: 0, y: 0}
 --- !u!114 &4438091874343390211
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -819,7 +821,33 @@ MonoBehaviour:
   obstacleMask:
     serializedVersion: 2
     m_Bits: 8
-  m_wardsOwned: 1
+  wardPlaceMode: 0
+--- !u!114 &2186205539621042158
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3880763020959147649}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84c00becf31aeb24e9f5e79c222332fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  gas: 0
+  bolt: 0
+  knifePrefab: {fileID: 5615243572935416288, guid: c95524645769c214c85047ede4779547, type: 3}
+  mortarPrefab: {fileID: 1253206550402709769, guid: e6ea2de18f4b4d9448713d126ccf4b30, type: 3}
+  slot2WeaponPrefabs:
+  - {fileID: 8132637147219163852, guid: ac438dca1f1309547affc1912811f5b2, type: 3}
+  - {fileID: 3606478749056955178, guid: 9e68eec69c7020745843357872bc0752, type: 3}
+  ward: 0
+  potion1: 0
+  potion2: 0
+  mortarUnlocked: 0
+  pistolBullets: 0
+  rifleBullets: 0
 --- !u!114 &5287047833319047997
 MonoBehaviour:
   m_ObjectHideFlags: 0

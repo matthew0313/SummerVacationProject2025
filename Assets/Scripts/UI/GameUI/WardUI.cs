@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using Unity.Netcode;
 
-public class WardUI : MonoBehaviour, ILocalPlayerSpawnCallback
+/*public class WardUI : MonoBehaviour, ILocalPlayerSpawnCallback
 {
     Player player;
     [SerializeField] Animator anim;
@@ -31,9 +31,10 @@ public class WardUI : MonoBehaviour, ILocalPlayerSpawnCallback
     void OnWardsPlacedChange()
     {
         wardPlacedText.text = $"{player.wardComp.wardsPlaced.Count}/{player.wardComp.maxWardsPlaced}";
-    }
+    }*/
     #region old
-    /*[Header("Ward Status")]
+/*
+    [Header("Ward Status")]
     [SerializeField] private GameObject wardStatusPanel;
     [SerializeField] private Image wardCooldownImage;
     [SerializeField] private TextMeshProUGUI wardCountText;
@@ -248,4 +249,4 @@ public class WardUI : MonoBehaviour, ILocalPlayerSpawnCallback
         }
     }*/
     #endregion
-}
+//}

@@ -26,11 +26,10 @@ public class Player : Entity
     [SerializeField] KeyCode potionUseKey;
 
     public readonly NetworkVariable<Team> team = new(Team.None);
-    public readonly NetworkVariable<bool> PVP = new(false);
-    [Rpc(SendTo.Authority)]
-    public void SetTeamRpc(Team team) => this.team.Value = team;
-    [Rpc(SendTo.Authority)]
-    public void SetPVPRpc(bool PVP) => this.PVP.Value = PVP;
+    public readonly NetworkVariable<bool> PVP = new(false), inRound = new(false);
+    [Rpc(SendTo.Authority)] public void SetTeamRpc(Team team) => this.team.Value = team;
+    [Rpc(SendTo.Authority)] public void SetPVPRpc(bool PVP) => this.PVP.Value = PVP;
+    [Rpc(SendTo.Authority)] public void SetInRoundRpc(bool inRound) => this.inRound.Value = inRound;
     bool isDead => hpComp.isDead.Value;
     TopLayer topLayer;
 

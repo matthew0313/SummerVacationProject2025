@@ -1,30 +1,35 @@
+using Unity.Netcode;
 using UnityEngine;
 
-public class Bullet : MonoBehaviour
+public class Bullet : NetworkBehaviour
 {
-    public float speed = 30f;
-    public float destroyTime = 2f;
-    public float damage = 10f;
-
-    void Start()
+    float speed, range, damage;
+    public void Set(float speed, float range, float damage)
     {
-        Destroy(gameObject, destroyTime);
+        this.speed = speed;
+        this.range = range;
+        this.damage = damage;
     }
 
+    float counter = 0.0f;
     void Update()
     {
+        if (!IsOwner) return;
         transform.Translate(Vector3.right * speed * Time.deltaTime);
+        counter += speed * Time.deltaTime;
+        if (counter > range) NetworkObject.Despawn();
     }
 
     private void OnTriggerEnter2D(Collider2D other) {
 
-        GameObject hitObject = other.attachedRigidbody.gameObject;
+        if (!IsOwner) return;
+        GameObject hitObject = other.attachedRigidbody != null ? other.attachedRigidbody.gameObject : other.gameObject;
 
-        if (hitObject.TryGetComponent(out IDamagable enemy))
+        if (hitObject.TryGetComponent(out IDamagable damagable) && Player.localPlayer.GetRelation(damagable.owner) == Relation.Enemy)
         {
-            enemy.GetDamage(damage);
-            Destroy(gameObject);
+            damagable.GetDamage(damage);
         }
+        NetworkObject.Despawn();
     }
 }
 

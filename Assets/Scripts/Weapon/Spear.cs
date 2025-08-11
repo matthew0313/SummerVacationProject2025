@@ -1,22 +1,21 @@
 using System.Collections.Generic;
+using Unity.Netcode.Components;
 using Unity.VisualScripting;
 using UnityEngine;
 
 public class Spear : Weapon
 {
-    private List<GameObject> hits = new List<GameObject>();
-    private Animator animator;
+    public float damage, shootCooldown = 1.0f;
 
-    public float shootCooldown = 1f;
+    private List<GameObject> hits = new List<GameObject>();
+    private NetworkAnimator animator;
     private float lastShootTime = -Mathf.Infinity;
 
-    void Start()
+    protected override void Awake()
     {
-        Debug.Log("창");
-
-        animator = GetComponent<Animator>();
+        base.Awake();
+        animator = GetComponent<NetworkAnimator>();
     }
-
     public override void Shoot()
     {
         if (Time.time < lastShootTime + shootCooldown)
@@ -29,11 +28,13 @@ public class Spear : Weapon
 
     private void OnTriggerStay2D(Collider2D other)
     {
-        GameObject hitObject = other.attachedRigidbody.gameObject;
+        if (!IsOwner) return;
+        GameObject hitObject = other.attachedRigidbody != null ? other.attachedRigidbody.gameObject : other.gameObject;
 
-        if (hitObject.TryGetComponent(out IDamagable enemy))
+        if (hitObject.TryGetComponent(out IDamagable damagable) &&
+            (owner.GetRelation(damagable.owner) == Relation.Enemy || damagable is Ward ward && ward.owner == owner))
         {
-            enemy.GetDamage(5.0f);
+            damagable.GetDamage(damage);
         }
     }
 }
