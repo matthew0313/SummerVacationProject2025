@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using NetworkAudioManagement;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
@@ -24,6 +25,7 @@ public class Player : Entity
     [Header("Movements")]
     [SerializeField] float moveSpeed = 5.0f;
     [SerializeField] Transform rotator, flipped;
+    [SerializeField] float footstepDistMin = 3.0f, footstepDistMax = 5.0f;
 
     [Header("Potions")]
     [SerializeField] KeyCode potionUseKey;
@@ -155,10 +157,12 @@ public class Player : Entity
         class Moving : State<Player>
         {
             public Moving(Player origin, Layer<Player> parent) : base(origin, parent) { }
+            PlayingSound footsteps = null;
             public override void OnStateEnter()
             {
                 base.OnStateEnter();
                 origin.animations.isWalking.Value = true;
+                footsteps = NetworkAudioManager.Instance.PlaySound("Walking").SetDistance(origin, origin.footstepDistMin, origin.footstepDistMax).SetLoop(true);
             }
             public override void OnStateUpdate()
             {
@@ -173,6 +177,7 @@ public class Player : Entity
             {
                 base.OnStateExit();
                 origin.animations.isWalking.Value = false;
+                footsteps.Stop();
             }
         }
         class Dead : State<Player>

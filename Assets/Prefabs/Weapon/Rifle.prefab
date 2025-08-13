@@ -250,6 +250,9 @@ MonoBehaviour:
   bulletRange: 25
   bulletPrefab: {fileID: -4490279527757619788, guid: 9b77c0d9b30171046b312807d1ed6aea, type: 3}
   firePoint: {fileID: 8418846181914654734}
+  fireSound: AK47 Fire
+  fireSoundMinDist: 20
+  fireSoundMaxDist: 40
 --- !u!95 &-6311652856477519586
 Animator:
   serializedVersion: 7

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using NetworkAudioManagement;
 using Unity.Netcode.Components;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -6,6 +7,8 @@ using UnityEngine;
 public class Spear : Weapon
 {
     public float damage, shootCooldown = 1.0f;
+    public string slashSound;
+    public float slashSoundDistMin = 8.0f, slashSoundDistMax = 15.0f;
 
     private List<GameObject> hits = new List<GameObject>();
     private NetworkAnimator animator;
@@ -22,6 +25,8 @@ public class Spear : Weapon
             return;
         lastShootTime = Time.time;
 
+        NetworkAudioManager.Instance.PlaySound(slashSound)
+            .SetDistance(transform.position, slashSoundDistMin, slashSoundDistMax);
         animator.SetTrigger("Shoot");
         hits.Clear();
     }
