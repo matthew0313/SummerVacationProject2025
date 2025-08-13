@@ -22,8 +22,8 @@ public class Player_HpComp : HpComp
     {
         if (HasAuthority)
         {
-            GameManager.Instance.onRoundStart += ResetHp;
-            GameManager.Instance.onRoundEnd += ResetHp;
+            GameManager.Instance.onRoundStart += () => ResetHp();
+            GameManager.Instance.onRoundEnd += result => ResetHp();
         }
     }
     protected override DamageReceivedInfo ProcessDamage(DamageInfo damage)

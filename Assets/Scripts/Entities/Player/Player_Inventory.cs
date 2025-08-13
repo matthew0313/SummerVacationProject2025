@@ -49,8 +49,8 @@ public class Player_Inventory : NetworkBehaviour
     {
         if (HasAuthority)
         {
-            GameManager.Instance.onRoundStart += ResetInventory;
-            GameManager.Instance.onRoundEnd += ResetInventory;
+            GameManager.Instance.onRoundStart += () => ResetInventory();
+            GameManager.Instance.onRoundEnd += result => ResetInventory();
             origin.hpComp.onDeath += OnDeath;
             origin.hpComp.onRespawn += OnRespawn;
 

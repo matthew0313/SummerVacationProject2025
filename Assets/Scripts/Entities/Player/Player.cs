@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Unity.Netcode;
 using Unity.Netcode.Components;
@@ -29,9 +30,19 @@ public class Player : Entity
 
     public readonly NetworkVariable<Team> team = new(Team.None);
     public readonly NetworkVariable<bool> PVP = new(false), inRound = new(false);
+
+    public readonly NetworkVariable<int> playerKills = new(0);
+    public readonly NetworkVariable<int> deaths = new(0);
     [Rpc(SendTo.Authority)] public void SetTeamRpc(Team team) => this.team.Value = team;
     [Rpc(SendTo.Authority)] public void SetPVPRpc(bool PVP) => this.PVP.Value = PVP;
     [Rpc(SendTo.Authority)] public void SetInRoundRpc(bool inRound) => this.inRound.Value = inRound;
+
+    [Rpc(SendTo.Authority)]
+    public void ResetRoundStatsRpc()
+    {
+        playerKills.Value = 0;
+        deaths.Value = 0;
+    }
     bool isDead => hpComp.isDead.Value;
     TopLayer topLayer;
 
@@ -183,6 +194,15 @@ public class Player : Entity
                 origin.animations.isDead.Value = false;
             }
         }
+    }
+
+    //Kills
+    public event Action<Entity> onKill;
+    [Rpc(SendTo.Owner)]
+    public void OnKillRpc(NetworkBehaviourReference killedRef)
+    {
+        if (!killedRef.TryGet(out Entity killed)) return;
+        onKill?.Invoke(killed);
     }
 }
 [System.Serializable]

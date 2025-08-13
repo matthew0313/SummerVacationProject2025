@@ -70,4 +70,8 @@ public abstract class Weapon : NetworkBehaviour
     }
 
     public virtual bool Trigger() => InputManager.Instance.ItemUseInput();
+    public interface ICooldownDisplayed
+    {
+        public float cooldownFill { get; }
+    }
 }

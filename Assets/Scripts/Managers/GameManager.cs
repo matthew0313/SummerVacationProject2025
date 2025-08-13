@@ -21,6 +21,7 @@ public class GameManager : NetworkBehaviour
 
     public readonly NetworkVariable<bool> roundInProgress = new(false);
     public readonly NetworkVariable<int> timeLeft = new(30);
+    public readonly NetworkVariable<bool> timerPaused = new(false);
 
     public readonly List<Player> players = new();
     private void Start()
@@ -42,7 +43,7 @@ public class GameManager : NetworkBehaviour
     private void Update()
     {
         if (!HasAuthority) return;
-        if(timeLeft.Value > 0)
+        if(timeLeft.Value > 0 && !timerPaused.Value)
         {
             counter += Time.deltaTime;
             if(counter >= 1.0f)
@@ -50,7 +51,7 @@ public class GameManager : NetworkBehaviour
                 counter -= 1.0f;
                 if(--timeLeft.Value <= 0)
                 {
-                    if (roundInProgress.Value) EndRound();
+                    if (roundInProgress.Value) EndRound(Team.None);
                     else StartRound();
                 }
             }
@@ -93,11 +94,14 @@ public class GameManager : NetworkBehaviour
         }
         OnRoundStartRpc();
     }
-    public event Action onRoundStart, onRoundEnd;
+    public event Action onRoundStart;
+    public event Action<RoundResult> onRoundEnd;
+
     [Rpc(SendTo.ClientsAndHost)]
     public void OnRoundStartRpc() => onRoundStart?.Invoke();
-    void EndRound()
+    public void EndRound(Team winningTeam)
     {
+        if (!roundInProgress.Value) return;
         roundInProgress.Value = false;
         timeLeft.Value = intermissionTime;
         foreach(var i in players)
@@ -106,13 +110,30 @@ public class GameManager : NetworkBehaviour
             {
                 i.SetPVPRpc(false);
                 i.SetInRoundRpc(false);
-                i.SetTeamRpc(Team.None);
                 i.hpComp.SetRespawnPosRpc(lobbySpawnPoint.position);
                 i.TeleportRpc(lobbySpawnPoint.position);
+
+                var target = RpcTarget.Single(i.OwnerClientId, RpcTargetUse.Temp);
+                if (winningTeam == Team.None)
+                {
+                    OnRoundEndRpc(RoundResult.Tied, target);
+                }
+                else
+                {
+                    if(i.team.Value == winningTeam) OnRoundEndRpc(RoundResult.Won, target);
+                    else OnRoundEndRpc(RoundResult.Lost, target);
+                }
+                i.SetTeamRpc(Team.None);
             }
         }
-        OnRoundEndRpc();
     }
-    [Rpc(SendTo.ClientsAndHost)]
-    public void OnRoundEndRpc() => onRoundEnd?.Invoke();
+    [Rpc(SendTo.SpecifiedInParams)]
+    public void OnRoundEndRpc(RoundResult result, RpcParams rpcParams) => onRoundEnd?.Invoke(result);
+}
+[System.Serializable]
+public enum RoundResult
+{
+    Tied = 0,
+    Won = 1,
+    Lost = 2
 }

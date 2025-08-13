@@ -42,7 +42,7 @@ public class Player_WardComp : NetworkBehaviour
         {
             topLayer = new(this);
             topLayer.OnStateEnter();
-            GameManager.Instance.onRoundEnd += () =>
+            GameManager.Instance.onRoundEnd += result =>
             {
                 foreach (var i in wardsPlaced)
                 {

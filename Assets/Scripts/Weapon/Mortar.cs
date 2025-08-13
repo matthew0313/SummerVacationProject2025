@@ -2,13 +2,17 @@ using UnityEngine;
 using System.Collections;
 using Unity.Netcode.Components;
 
-public class Mortar : Weapon
+public class Mortar : Weapon, Weapon.ICooldownDisplayed
 {
-    [SerializeField] float shootCooldown = 60.0f;
+    [SerializeField] float shootCooldown = 30.0f;
+    [SerializeField] Transform firePoint;
+    [SerializeField] MortarRocket rocket;
 
     private NetworkAnimator animator;
-    public TeamBase targetBase;
+    private TeamBase targetBase;
     private float lastShootTime = -Mathf.Infinity;
+
+    public float cooldownFill => 1.0f - Mathf.Max((Time.time - lastShootTime) / shootCooldown, 1.0f);
 
     private bool isShooting = false;
     private Coroutine ShootCoroutine;
@@ -30,13 +34,26 @@ public class Mortar : Weapon
     {
         isShooting = true;
         animator.Animator.SetBool("Shooting", true);
-        yield return new WaitForSeconds(delay);
+        float counter = 0.0f;
+        while(counter < delay)
+        {
+            yield return null;
+            counter += Time.deltaTime;
+            if (targetBase == null)
+            {
+                isShooting = true;
+                animator.Animator.SetBool("Shooting", false);
+                yield break;
+            }
+        }
         animator.SetTrigger("Shoot");
-        StartCoroutine(ExplosionAfterDelay(2f));
-    }
-    private IEnumerator ExplosionAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
+        isShooting = false;
+        animator.Animator.SetBool("Shooting", false);
+
+        Vector2 firePos = firePoint.position, targetPos = targetBase.transform.position;
+        MortarRocket rocket = Instantiate(this.rocket, firePos, Quaternion.Euler(0, 0, Mathf.Atan2(targetPos.y - firePos.y, targetPos.x - firePos.x) * Mathf.Rad2Deg));
+        rocket.NetworkObject.Spawn(true);
+        rocket.Set(targetBase, 2.0f);
     }
 
     private void OnTriggerEnter2D(Collider2D other)

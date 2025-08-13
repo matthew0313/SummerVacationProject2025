@@ -2,7 +2,7 @@ using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
 
-public abstract class Gun : Weapon
+public abstract class Gun : Weapon, Weapon.ICooldownDisplayed
 {
     public Sprite bulletSprite;
 
@@ -13,6 +13,7 @@ public abstract class Gun : Weapon
     private NetworkAnimator animator;
     private float lastShootTime = -Mathf.Infinity;
 
+    public float cooldownFill => 1.0f - Mathf.Max((Time.time - lastShootTime) / shootCooldown, 1.0f);
     public abstract int bullets { get; set; }
     protected override void Awake()
     {
