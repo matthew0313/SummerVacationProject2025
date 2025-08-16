@@ -26,6 +26,11 @@ public class Player_HpComp : HpComp
             GameManager.Instance.onRoundEnd += () => ResetHp();
         }
     }
+    public void Heal(float amount)
+    {
+        if (!HasAuthority || isDead.Value) return;
+        hp.Value = Mathf.Min(maxHp.Value, hp.Value + amount);
+    }
     protected override DamageReceivedInfo ProcessDamage(DamageInfo damage)
     {
         var info = base.ProcessDamage(damage);

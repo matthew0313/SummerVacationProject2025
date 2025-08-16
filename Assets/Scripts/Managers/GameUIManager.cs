@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -15,6 +16,10 @@ public class GameUIManager : TabOpener
     [Header("Tabs")]
     [SerializeField] ShopTab m_shopTab;
     public ShopTab shopTab => m_shopTab;
+
+    [Header("Hp")]
+    [SerializeField] TMP_Text hpText;
+    [SerializeField] Transform hpBar;
 
     [Header("Other UIs")]
     [SerializeField] RoundTimerUI m_roundTimerUI;
@@ -40,5 +45,7 @@ public class GameUIManager : TabOpener
     private void Update()
     {
         if (InputManager.Instance.EscapeInput()) CloseTab();
+        hpText.text = $"{Player.localPlayer.hpComp.hp.Value} | {Player.localPlayer.hpComp.maxHp.Value}";
+        hpBar.localScale = new Vector3(Player.localPlayer.hpComp.hp.Value / Player.localPlayer.hpComp.maxHp.Value, 1.0f, 1.0f);
     }
 }
