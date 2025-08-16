@@ -1,9 +1,12 @@
+using NetworkAudioManagement;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
 public class BoltPickup : Pickup
 {
     [SerializeField] int bolt = 10;
+    [SerializeField] string pickupSound;
+    [SerializeField] float pickupSoundDistMin = 5.0f, pickupSoundDistMax = 8.0f;
     private void OnEnable()
     {
         GameManager.Instance.onRoundEnd += OnRoundEnd;
@@ -18,6 +21,7 @@ public class BoltPickup : Pickup
     }
     protected override void OnPickup(Player picker)
     {
+        NetworkAudioManager.Instance.PlaySound(pickupSound).SetDistance(transform.position, pickupSoundDistMin, pickupSoundDistMax);
         picker.inventory.AddBoltRpc(bolt);
         NetworkObject.Despawn();
     }

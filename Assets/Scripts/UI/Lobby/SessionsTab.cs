@@ -70,5 +70,5 @@ public class SessionsTab : Tab
     void JoinOrStartSession() => SessionManager.Instance.JoinOrStartSession(sessionID.text);
     void StartSession() => SessionManager.Instance.StartSession();
     void OnSignIn() => playerNameField.text = SessionManager.Instance.playerName;
-    void OnPlayerNameChange(string text) => SessionManager.Instance.playerName = text;
+    void OnPlayerNameChange(string text) => SessionManager.Instance.SetPlayerName(text);
 }

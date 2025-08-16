@@ -11,8 +11,10 @@ namespace NetworkAudioManagement
         public static NetworkAudioManager Instance { get; private set; }
         public NetworkAudioManager() => Instance = this;
 
-        [SerializeField] internal List<SoundNamePair> sounds, musics;
+        [SerializeField] SoundList m_sounds, m_musics;
         [SerializeField] AudioSource musicSource;
+        internal List<SoundNamePair> sounds => m_sounds.soundList;
+        internal List<SoundNamePair> musics => m_musics.soundList;
 
         public readonly NetworkVariable<int> currentMusicIndex = new(0);
         Sound currentMusic = null;
@@ -64,7 +66,7 @@ namespace NetworkAudioManagement
             }
             currentMusic = musics[index].sound;
             musicSource.clip = currentMusic.clip;
-            musicSource.volume = currentMusic.volume;
+            musicSource.volume = currentMusic.volume * Settings.BGMVolume;
             musicSource.pitch = currentMusic.pitch;
             musicSource.Play();
             musicSource.time = currentMusic.startTime;
@@ -84,11 +86,14 @@ namespace NetworkAudioManagement
         private void OnEnable()
         {
             NetworkManager.OnConnectionEvent += OnConnection;
+            Settings.onBGMVolumeChange += OnBGMVolumeChange;
         }
         private void OnDisable()
         {
             NetworkManager.OnConnectionEvent -= OnConnection;
+            Settings.onBGMVolumeChange -= OnBGMVolumeChange;
         }
+        void OnBGMVolumeChange() => musicSource.volume = (currentMusic != null ? currentMusic.volume : 0) * Settings.BGMVolume;
         private void OnConnection(NetworkManager manager, ConnectionEventData data)
         {
             if (data.EventType == ConnectionEvent.PeerConnected)
@@ -212,12 +217,19 @@ namespace NetworkAudioManagement
             if (!playingSounds.TryGetValue(soundID, out PlayingSound sound)) return;
             sound.Restart();
         }
-    }
-    [System.Serializable]
-    internal struct SoundNamePair
-    {
-        public string name;
-        public Sound sound;
+        [Rpc(SendTo.NotMe)]
+        internal void SetVolumeGroupRpc(ulong soundID, VolumeGroup group)
+        {
+            if (!playingSounds.TryGetValue(soundID, out PlayingSound sound)) return;
+            sound.SetVolumeGroup(group);
+        }
+        internal float GetVolume(VolumeGroup group)
+        {
+            float val = 1.0f;
+            if ((group | VolumeGroup.SFX) != 0) val *= Settings.SFXVolume;
+            if ((group | VolumeGroup.BGM) != 0) val *= Settings.BGMVolume;
+            return val;
+        }
     }
     public class PlayingSound
     {
@@ -283,9 +295,16 @@ namespace NetworkAudioManagement
             source.time = sound.startTime;
             return this;
         }
+        public VolumeGroup group { get; private set; } = VolumeGroup.SFX;
+        public PlayingSound SetVolumeGroup(VolumeGroup group)
+        {
+            if (isOwner) manager.SetVolumeGroupRpc(id, group);
+            this.group = group;
+            return this;
+        }
         public void Update()
         {
-            float volume = sound.volume * this.volume;
+            float volume = sound.volume * this.volume * manager.GetVolume(group);
             if (hasDistance && Player.localPlayer != null)
             {
                 float dist = Vector2.Distance(Player.localPlayer.transform.position, locationSource != null ? locationSource.transform.position : location);
@@ -304,5 +323,12 @@ namespace NetworkAudioManagement
         {
             manager.StopSound(this);
         }
+    }
+    [Flags]
+    [System.Serializable]
+    public enum VolumeGroup
+    {
+        SFX = 1 << 0,
+        BGM = 1 << 1,
     }
 }

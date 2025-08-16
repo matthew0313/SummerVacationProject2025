@@ -7,6 +7,7 @@ using Unity.Services.Core;
 using Unity.Services.Multiplayer;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static UnityEngine.Rendering.DebugUI;
 
 public class SessionManager : MonoBehaviour
 {
@@ -28,7 +29,8 @@ public class SessionManager : MonoBehaviour
     {
         DontDestroyOnLoad(this);
     }
-    public Action onSignIn;
+    public event Action onSignIn;
+    public event Action<string> onPlayerNameChange;
     public bool signedIn { get; private set; } = false;
     public string playerName
     {
@@ -38,10 +40,11 @@ public class SessionManager : MonoBehaviour
             tmp = tmp.Substring(0, tmp.IndexOf('#'));
             return tmp;
         }
-        set
-        {
-            AuthenticationService.Instance.UpdatePlayerNameAsync(value);
-        }
+    }
+    public async void SetPlayerName(string playerName)
+    {
+        await AuthenticationService.Instance.UpdatePlayerNameAsync(playerName);
+        onPlayerNameChange?.Invoke(playerName);
     }
     async void Start()
     {

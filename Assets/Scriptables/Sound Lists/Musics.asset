@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b303d0d0892a56c4fb1d8bc1a79b3841, type: 3}
+  m_Name: Musics
+  m_EditorClassIdentifier: 
+  m_soundList:
+  - name: Intermission
+    sound:
+      clip: {fileID: 8300000, guid: 8fedbb08c77670649875e27fbdb9e322, type: 3}
+      volume: 0.2
+      pitch: 1
+      startTime: 0
+      foldout: 1
+  - name: InGame
+    sound:
+      clip: {fileID: 8300000, guid: dd3b372f4772cda4d8e0a525640c39dd, type: 3}
+      volume: 0.3
+      pitch: 1
+      startTime: 0
+      foldout: 1

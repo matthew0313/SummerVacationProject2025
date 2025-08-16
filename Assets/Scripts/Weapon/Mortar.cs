@@ -36,20 +36,51 @@ public class Mortar : Weapon
         }
         else
         {
-            marker.transform.position = targets[0].transform.position;
+            marker.transform.position = target.transform.position;
             marker.Show();
         }
+        currentTarget = target;
     }
     protected override void Update()
     {
         base.Update();
-        targets.RemoveAll(item => item.broken.Value);
+        if (!IsOwner) return;
         if (!isShooting)
         {
             if (targets.Count > 0)
             {
-                targets.Sort((a, b) => Vector2.Distance(transform.position, a.transform.position).CompareTo(Vector2.Distance(transform.position, b.transform.position)));
-                ChangeTarget(targets[0]);
+                targets.Sort((a, b) =>
+                {
+                    if (a.broken.Value)
+                    {
+                        if (b.broken.Value) return 0;
+                        else return 1;
+                    }
+                    if (b.broken.Value) return -1;
+
+                    Vector2 dir = (a.transform.position - firePoint.position).normalized;
+                    float dist = Vector2.Distance(a.transform.position, firePoint.position);
+                    bool aBlocked = Physics2D.Raycast(firePoint.position, dir, dist, LayerMask.NameToLayer("Map"));
+                    dir = (b.transform.position - firePoint.position).normalized;
+                    dist = Vector2.Distance(b.transform.position, firePoint.position);
+                    bool bBlocked = Physics2D.Raycast(firePoint.position, dir, dist, LayerMask.NameToLayer("Map"));
+                    if (aBlocked)
+                    {
+                        if (bBlocked) return 0;
+                        else return 1;
+                    }
+                    if (bBlocked) return -1;
+
+                    return Vector2.Distance(transform.position, a.transform.position).CompareTo(Vector2.Distance(transform.position, b.transform.position));
+                });
+
+                var tmp = targets[0];
+                Vector2 dir = (tmp.transform.position - firePoint.position).normalized;
+                float dist = Vector2.Distance(tmp.transform.position, firePoint.position);
+                bool blocked = Physics2D.Raycast(firePoint.position, dir, dist, LayerMask.NameToLayer("Map"));
+
+                if (!tmp.broken.Value && !blocked) ChangeTarget(targets[0]);
+                else ChangeTarget(null);
             }
             else ChangeTarget(null);
         }
@@ -99,7 +130,7 @@ public class Mortar : Weapon
     {
         GameObject hitObject = other.attachedRigidbody != null ? other.attachedRigidbody.gameObject : other.gameObject;
 
-        if (hitObject.TryGetComponent(out MortarTarget target) && !target.broken.Value && target.team != owner.team.Value)
+        if (hitObject.TryGetComponent(out MortarTarget target) && target.team != owner.team.Value)
         {
             targets.Add(target);
         }

@@ -262,8 +262,9 @@ MonoBehaviour:
   damage: 20
   shootCooldown: 0.5
   slashSound: Knife Slash
-  slashSoundDistMin: 8
-  slashSoundDistMax: 15
+  slashHitSound: Knife Hit
+  soundDistMin: 5
+  soundDistMax: 8
 --- !u!95 &-6311652856477519586
 Animator:
   serializedVersion: 7

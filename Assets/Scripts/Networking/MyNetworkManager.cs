@@ -36,5 +36,9 @@ public class MyNetworkManager : MonoBehaviour
         {
             if(manager.LocalClient.IsSessionOwner) networkManager.SceneManager.LoadScene("Game", LoadSceneMode.Single);
         }
+        if(data.EventType == ConnectionEvent.ClientDisconnected && data.ClientId == manager.LocalClientId)
+        {
+            SceneManager.LoadScene("Lobby");
+        }
     }
 }

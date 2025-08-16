@@ -25,7 +25,9 @@ public class Player : Entity
     [Header("Movements")]
     [SerializeField] float moveSpeed = 5.0f;
     [SerializeField] Transform rotator, flipped;
+    [SerializeField] string footstepSound;
     [SerializeField] float footstepDistMin = 3.0f, footstepDistMax = 5.0f;
+    [SerializeField] float footstepRate = 0.3f;
     public float speedMultiplier = 1.0f;
 
     [Header("Potions")]
@@ -69,6 +71,7 @@ public class Player : Entity
             {
                 i.OnLocalPlayerSpawn(this);
             }
+            hpComp.onDeath += () => rb.linearVelocity = Vector2.zero;
         }
 
         if (IsOwner)
@@ -166,8 +169,9 @@ public class Player : Entity
             {
                 base.OnStateEnter();
                 origin.animations.isWalking.Value = true;
-                footsteps = NetworkAudioManager.Instance.PlaySound("Walking").SetDistance(origin, origin.footstepDistMin, origin.footstepDistMax).SetLoop(true);
+                footsteps = NetworkAudioManager.Instance.PlaySound(origin.footstepSound).SetDistance(origin, origin.footstepDistMin, origin.footstepDistMax).SetLoop(true);
             }
+            float footstepCounter = 0.0f;
             public override void OnStateUpdate()
             {
                 base.OnStateUpdate();
@@ -176,6 +180,12 @@ public class Player : Entity
                     parentLayer.ChangeState("Idle"); return;
                 }
                 origin.rb.linearVelocity = origin.MoveInput() * origin.moveSpeed * origin.speedMultiplier;
+                if (footstepCounter < origin.footstepRate) footstepCounter += Time.deltaTime;
+                if(footstepCounter >= origin.footstepRate)
+                {
+                    footstepCounter -= origin.footstepRate;
+                    footsteps.Restart();
+                }
             }
             public override void OnStateExit()
             {

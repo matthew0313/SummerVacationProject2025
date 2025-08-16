@@ -147,7 +147,7 @@ public class GameManager : NetworkBehaviour
     {
         if (!HasAuthority) return;
         gameState.Value = GameState.Intermission;
-        timeLeft.Value = roundEndTime;
+        timeLeft.Value = intermissionTime;
         NetworkAudioManager.Instance.ChangeMusic("Intermission");
         foreach(var i in players)
         {
@@ -159,6 +159,7 @@ public class GameManager : NetworkBehaviour
                 i.TeleportRpc(lobbySpawnPoint.position);
             }
         }
+        onRoundEnd?.Invoke();
     }
     [Rpc(SendTo.Everyone)]
     public void OnRoundEndRpc() => onRoundEnd?.Invoke();

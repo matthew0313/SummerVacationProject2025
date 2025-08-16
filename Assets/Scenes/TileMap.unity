@@ -130,7 +130,7 @@ GameObject:
   - component: {fileID: 32746345}
   - component: {fileID: 32746347}
   - component: {fileID: 32746346}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: final
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40450,7 +40450,7 @@ GameObject:
   m_Component:
   - component: {fileID: 585602499}
   - component: {fileID: 585602498}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: last
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40478,7 +40478,7 @@ Transform:
   m_GameObject: {fileID: 585602497}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.7859671, y: 0.64522904, z: 0.015981881}
+  m_LocalPosition: {x: 0, y: 0.64522904, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -40496,7 +40496,7 @@ GameObject:
   - component: {fileID: 647229571}
   - component: {fileID: 647229573}
   - component: {fileID: 647229572}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Tilemap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -51483,7 +51483,7 @@ GameObject:
   - component: {fileID: 727370808}
   - component: {fileID: 727370810}
   - component: {fileID: 727370809}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: deco
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -112405,7 +112405,7 @@ GameObject:
   m_Component:
   - component: {fileID: 920826196}
   - component: {fileID: 920826195}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: deco 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -112433,7 +112433,7 @@ Transform:
   m_GameObject: {fileID: 920826194}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.7859671, y: 0.94522905, z: 0.015981881}
+  m_LocalPosition: {x: 0, y: 0.94522905, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -112450,7 +112450,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1207620866}
   - component: {fileID: 1207620865}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Amend deco
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -112478,7 +112478,7 @@ Transform:
   m_GameObject: {fileID: 1207620864}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.7859671, y: 0.64522904, z: 0.015981881}
+  m_LocalPosition: {x: 0, y: 0.64522904, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -112496,7 +112496,7 @@ GameObject:
   - component: {fileID: 1260382379}
   - component: {fileID: 1260382381}
   - component: {fileID: 1260382380}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Tilemap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -273306,7 +273306,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1300776939}
   - component: {fileID: 1300776938}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: deco 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -273334,7 +273334,7 @@ Transform:
   m_GameObject: {fileID: 1300776937}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.7859671, y: 0.94522905, z: 0.015981881}
+  m_LocalPosition: {x: 0, y: 0.94522905, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -273489,7 +273489,7 @@ GameObject:
   - component: {fileID: 1566823793}
   - component: {fileID: 1566823795}
   - component: {fileID: 1566823794}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Tilemap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -304745,7 +304745,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1741922908}
   - component: {fileID: 1741922907}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Map
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -304773,7 +304773,7 @@ Transform:
   m_GameObject: {fileID: 1741922906}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.7859671, y: 1.0452291, z: 0.015981881}
+  m_LocalPosition: {x: 0, y: 1.0452291, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -304791,7 +304791,7 @@ GameObject:
   - component: {fileID: 1937542303}
   - component: {fileID: 1937542305}
   - component: {fileID: 1937542304}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Tilemap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -315034,7 +315034,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1943048008}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: TileMap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -315050,8 +315050,8 @@ Transform:
   m_GameObject: {fileID: 1943048007}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.7859671, y: -0.64522904, z: -0.015981881}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -0.01590188}
+  m_LocalScale: {x: 3, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1741922908}
@@ -315073,7 +315073,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2049289847}
   - component: {fileID: 2049289846}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Amend
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -315101,7 +315101,7 @@ Transform:
   m_GameObject: {fileID: 2049289845}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.7859671, y: 0.64522904, z: 0.015981881}
+  m_LocalPosition: {x: 0, y: 0.64522904, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -315118,7 +315118,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2074827060}
   - component: {fileID: 2074827059}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: last deco
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -315146,7 +315146,7 @@ Transform:
   m_GameObject: {fileID: 2074827058}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.7859671, y: 0.64522904, z: 0.015981881}
+  m_LocalPosition: {x: 0, y: 0.64522904, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -315164,7 +315164,7 @@ GameObject:
   - component: {fileID: 2095896491}
   - component: {fileID: 2095896493}
   - component: {fileID: 2095896492}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Amend deco
   m_TagString: Untagged
   m_Icon: {fileID: 0}

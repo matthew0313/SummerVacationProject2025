@@ -4,7 +4,8 @@ using UnityEngine;
 
 public abstract class PooledPrefab<T> : MonoBehaviour where T : PooledPrefab<T>
 {
-    static Dictionary<GameObject, List<T>> pools = null;
+    static Dictionary<GameObject, List<T>> pools;
+
     GameObject prefabOrigin;
     bool instantiated = false;
     public bool released { get; private set; } = false;
@@ -61,5 +62,5 @@ public abstract class PooledPrefab<T> : MonoBehaviour where T : PooledPrefab<T>
 }
 public class PooledPrefab : PooledPrefab<PooledPrefab>
 {
-
+    
 }

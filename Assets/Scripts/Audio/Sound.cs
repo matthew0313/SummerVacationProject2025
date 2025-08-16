@@ -56,7 +56,7 @@ public class Sound_Drawer : PropertyDrawer
             {
                 if (testSource == null)
                 {
-                    testSource = new GameObject() { hideFlags = HideFlags.HideAndDontSave }.AddComponent<AudioSource>();
+                    testSource = new GameObject() { hideFlags = HideFlags.HideInHierarchy | HideFlags.DontSaveInEditor | HideFlags.DontSaveInBuild }.AddComponent<AudioSource>();
                     testSource.playOnAwake = false;
                 }
                 testSource.clip = clipProperty.objectReferenceValue as AudioClip;

@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b303d0d0892a56c4fb1d8bc1a79b3841, type: 3}
+  m_Name: Sounds
+  m_EditorClassIdentifier: 
+  m_soundList:
+  - name: Knife Slash
+    sound:
+      clip: {fileID: 8300000, guid: c557d1071cf39fa41a645d634b3ebbde, type: 3}
+      volume: 0.8
+      pitch: 1
+      startTime: 0.2
+      foldout: 1
+  - name: Knife Hit
+    sound:
+      clip: {fileID: 8300000, guid: 8c6ff255a63dd7043a179ba1d9953b2b, type: 3}
+      volume: 0.8
+      pitch: 1
+      startTime: 0
+      foldout: 1
+  - name: Pistol Fire
+    sound:
+      clip: {fileID: 8300000, guid: 1c0d174090f5ad44f95fc4b3146d8d1b, type: 3}
+      volume: 0.3
+      pitch: 1
+      startTime: 0.05
+      foldout: 1
+  - name: AK47 Fire
+    sound:
+      clip: {fileID: 8300000, guid: f0bfc2dd25f4b6c4aa65b7c8ddee832c, type: 3}
+      volume: 0.5
+      pitch: 1
+      startTime: 0.05
+      foldout: 1
+  - name: Mortar Fire
+    sound:
+      clip: {fileID: 8300000, guid: 581727656b5cedc428386298cc86a58b, type: 3}
+      volume: 0.6
+      pitch: 1
+      startTime: 5
+      foldout: 1
+  - name: Footsteps
+    sound:
+      clip: {fileID: 8300000, guid: 279cc716b8341ab469d414fac050e6a6, type: 3}
+      volume: 1
+      pitch: 1
+      startTime: 0.8
+      foldout: 1
+  - name: Victory
+    sound:
+      clip: {fileID: 8300000, guid: e7c66292e26c37e4487fb975398f908b, type: 3}
+      volume: 0.5
+      pitch: 1
+      startTime: 0
+      foldout: 1
+  - name: Pickup
+    sound:
+      clip: {fileID: 8300000, guid: 7840f44ae169f454ab8f255ed8786b79, type: 3}
+      volume: 0.3
+      pitch: 1
+      startTime: 0.5
+      foldout: 1

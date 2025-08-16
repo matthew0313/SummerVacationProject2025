@@ -15,7 +15,9 @@ public class GameUIManager : TabOpener
 
     [Header("Tabs")]
     [SerializeField] ShopTab m_shopTab;
+    [SerializeField] PauseTab m_pauseTab;
     public ShopTab shopTab => m_shopTab;
+    public PauseTab pauseTab => m_pauseTab;
 
     [Header("Hp")]
     [SerializeField] TMP_Text hpText;
@@ -44,8 +46,11 @@ public class GameUIManager : TabOpener
     }
     private void Update()
     {
-        if (InputManager.Instance.EscapeInput()) CloseTab();
-        hpText.text = $"{Player.localPlayer.hpComp.hp.Value} | {Player.localPlayer.hpComp.maxHp.Value}";
-        hpBar.localScale = new Vector3(Player.localPlayer.hpComp.hp.Value / Player.localPlayer.hpComp.maxHp.Value, 1.0f, 1.0f);
+        if (InputManager.Instance.EscapeInput()) OpenTab(pauseTab);
+        if(Player.localPlayer != null)
+        {
+            hpText.text = $"{Player.localPlayer.hpComp.hp.Value} | {Player.localPlayer.hpComp.maxHp.Value}";
+            hpBar.localScale = new Vector3(Player.localPlayer.hpComp.hp.Value / Player.localPlayer.hpComp.maxHp.Value, 1.0f, 1.0f);
+        }
     }
 }

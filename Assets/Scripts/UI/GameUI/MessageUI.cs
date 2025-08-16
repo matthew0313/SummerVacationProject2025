@@ -41,20 +41,20 @@ public class MessageUI : MonoBehaviour
                 msg = msg.Substring(3);
                 if(Player.localPlayer.team.Value == Team.None)
                 {
-                    MessageManager.Instance.SendMessageRpc("<color=#FF0000>현재 팀에 속해 있지 않습니다.</color>");
+                    MessageManager.Instance.SendMessageToPlayer("<color=#FF0000>현재 팀에 속해 있지 않습니다.</color>", Player.localPlayer);
                     return;
                 }
                 foreach (var player in GameManager.Instance.players)
                 {
                     if (player.team.Value != Team.None && player.team.Value == Player.localPlayer.team.Value)
                     {
-                        MessageManager.Instance.SendMessageRpc($"<b>[팀 채팅] {SessionManager.Instance.playerName}</b>: {msg}");
+                        MessageManager.Instance.SendMessageToPlayer($"<b>[팀 채팅] {SessionManager.Instance.playerName}</b>: {msg}", player);
                     }
                 }
             }
             else
             {
-                MessageManager.Instance.SendMessageRpc($"<b>{SessionManager.Instance.playerName}</b>: {msg}");
+                MessageManager.Instance.SendMessageToAll($"<b>{SessionManager.Instance.playerName}</b>: {msg}");
             }
         }
     }

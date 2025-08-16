@@ -269,6 +269,9 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   pickTimer: 1
   gas: 10
+  pickupSound: Pickup
+  pickupSoundDistMin: 5
+  pickupSoundDistMax: 8
 --- !u!114 &5148617337937139628
 MonoBehaviour:
   m_ObjectHideFlags: 0

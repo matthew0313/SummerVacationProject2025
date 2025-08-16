@@ -319,6 +319,9 @@ MonoBehaviour:
   shootTime: 2
   shootEndlag: 1
   shootSpeed: 0.3
+  fireSound: Mortar Fire
+  fireSoundMinDist: 20
+  fireSoundMaxDist: 40
 --- !u!95 &6480622579300485635
 Animator:
   serializedVersion: 7
