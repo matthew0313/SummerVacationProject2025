@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TeamGenerator : MortarTarget
 {
-    public const int maxTier = 4;
+    public const int maxTier = 3;
 
     [SerializeField] NetworkAnimator anim;
     [SerializeField] int regenTime = 30;
