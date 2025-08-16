@@ -30,7 +30,7 @@ public class GameUIManager : TabOpener
     
     private void Awake()
     {
-        GameManager.Instance.onRoundEnd += result =>
+        GameManager.Instance.onRoundComplete += result =>
         {
             if (result == RoundResult.Tied) anim.SetTrigger(tiedID);
             else if (result == RoundResult.Won) anim.SetTrigger(wonID);

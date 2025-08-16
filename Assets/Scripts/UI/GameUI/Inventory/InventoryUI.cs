@@ -10,6 +10,8 @@ public class InventoryUI : MonoBehaviour, ILocalPlayerSpawnCallback
     [SerializeField] SlotUI[] slotUIs = new SlotUI[Player_Inventory.slotCount];
     [SerializeField] Image weapon2Image, bulletsImage;
     [SerializeField] TMP_Text gas, bolt, ward, potion1, potion2, bullets;
+    [SerializeField] GameObject mortarLock;
+    [SerializeField] Image potion1Cooldown, potion2Cooldown;
 
     int selectedIndex = 0;
     SlotUI selected;
@@ -46,11 +48,14 @@ public class InventoryUI : MonoBehaviour, ILocalPlayerSpawnCallback
             selected = slotUIs[selectedIndex];
             selected.SetSelected(true);
         }
-        gas.text = Player.localPlayer.inventory.gas.ToString();
-        bolt.text = Player.localPlayer.inventory.bolt.ToString();
+        gas.text = Player.localPlayer.inventory.gas.Value.ToString();
+        bolt.text = Player.localPlayer.inventory.bolt.Value.ToString();
         ward.text = Player.localPlayer.inventory.ward.ToString();
         potion1.text = Player.localPlayer.inventory.potion1.ToString();
         potion2.text = Player.localPlayer.inventory.potion2.ToString();
+        mortarLock.SetActive(!Player.localPlayer.inventory.mortarUnlocked);
+        potion1Cooldown.fillAmount = Player.localPlayer.inventory.potion1CooldownCounter / Player.localPlayer.inventory.potion1Cooldown;
+        potion2Cooldown.fillAmount = Player.localPlayer.inventory.potion2CooldownCounter / Player.localPlayer.inventory.potion2Cooldown;
         var weapon2Slot = Player.localPlayer.inventory.slots[1] as Player_Inventory.WeaponSlot;
         if(weapon2Slot.weapon is Gun gun)
         {

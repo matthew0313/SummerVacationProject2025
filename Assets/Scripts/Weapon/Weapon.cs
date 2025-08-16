@@ -19,7 +19,7 @@ public abstract class Weapon : NetworkBehaviour
         gameObject.SetActive(active.Value);
     }
     private Vector2 direction;
-    void Update()
+    protected virtual void Update()
     {
         if (!IsOwner) return;
         Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -70,8 +70,4 @@ public abstract class Weapon : NetworkBehaviour
     }
 
     public virtual bool Trigger() => InputManager.Instance.ItemUseInput();
-    public interface ICooldownDisplayed
-    {
-        public float cooldownFill { get; }
-    }
 }

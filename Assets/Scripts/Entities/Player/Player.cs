@@ -26,9 +26,12 @@ public class Player : Entity
     [SerializeField] float moveSpeed = 5.0f;
     [SerializeField] Transform rotator, flipped;
     [SerializeField] float footstepDistMin = 3.0f, footstepDistMax = 5.0f;
+    public float speedMultiplier = 1.0f;
 
     [Header("Potions")]
-    [SerializeField] KeyCode potionUseKey;
+    [SerializeField] float attackBuffMultiplier = 1.5f;
+    public float attackBuffCounter = 0.0f;
+    public float attackMultiplier => attackBuffCounter > 0.0f ? attackBuffMultiplier : 1.0f;
 
     public readonly NetworkVariable<Team> team = new(Team.None);
     public readonly NetworkVariable<bool> PVP = new(false), inRound = new(false);
@@ -81,6 +84,7 @@ public class Player : Entity
         {
             topLayer.OnStateUpdate();
             UpdateRotation();
+            if (attackBuffCounter > 0) attackBuffCounter = Mathf.Max(attackBuffCounter - Time.deltaTime, 0.0f);
         }
         if (localPlayer != null) anim.SetInteger(relationID, (int)localPlayer.GetRelation(this));
         
@@ -171,7 +175,7 @@ public class Player : Entity
                 {
                     parentLayer.ChangeState("Idle"); return;
                 }
-                origin.rb.linearVelocity = origin.MoveInput() * origin.moveSpeed;
+                origin.rb.linearVelocity = origin.MoveInput() * origin.moveSpeed * origin.speedMultiplier;
             }
             public override void OnStateExit()
             {

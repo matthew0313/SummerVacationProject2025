@@ -9,9 +9,9 @@ public class Player_Inventory : NetworkBehaviour
 {
     Player origin;
 
-    public int gas = 0, bolt = 0;
-    [Rpc(SendTo.Authority)] public void AddGasRpc(int amount) => gas += amount;
-    [Rpc(SendTo.Authority)] public void AddBoltRpc(int amount) => bolt += amount;
+    public readonly NetworkVariable<int> gas = new(0), bolt = new(0);
+    [Rpc(SendTo.Authority)] public void AddGasRpc(int amount) => gas.Value += amount;
+    [Rpc(SendTo.Authority)] public void AddBoltRpc(int amount) => bolt.Value += amount;
 
     [Header("Weapons")]
     [SerializeField] Spear knifePrefab;
@@ -29,11 +29,38 @@ public class Player_Inventory : NetworkBehaviour
     public bool mortarUnlocked = false;
     public int pistolBullets = 0, rifleBullets = 0;
 
+    [Header("Potion1")]
+    [SerializeField] float potion1Heal = 30.0f;
+    [SerializeField] float m_potion1Cooldown = 10.0f;
+
+    [Header("Potion2")]
+    [SerializeField] float potion2Duration = 5.0f;
+    [SerializeField] float m_potion2Cooldown = 15.0f;
+    public float potion1Cooldown => m_potion1Cooldown;
+    public float potion2Cooldown => m_potion2Cooldown;
+    public float potion1CooldownCounter { get; private set; } = 0.0f;
+    public float potion2CooldownCounter { get; private set; } = 0.0f;
+
+    [Header("Pickups")]
+    [SerializeField] float pickupRadius;
+    [SerializeField] LayerMask pickupLayer;
+
+    [Header("Drops")]
+    [SerializeField] float dropForce = 3.0f;
+    [SerializeField] GasPickup gasPickupPrefab;
+    [SerializeField] BoltPickup boltPickupPrefab;
+
     public event Action<Weapon> onWeapon2Change;
 
     public const int slotCount = 7;
     public int slotIndex { get; private set; } = 0;
     public readonly Slot[] slots = new Slot[slotCount];
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position, pickupRadius);
+    }
     private void Awake()
     {
         origin = GetComponent<Player>();
@@ -50,7 +77,7 @@ public class Player_Inventory : NetworkBehaviour
         if (HasAuthority)
         {
             GameManager.Instance.onRoundStart += () => ResetInventory();
-            GameManager.Instance.onRoundEnd += result => ResetInventory();
+            GameManager.Instance.onRoundEnd += () => ResetInventory();
             origin.hpComp.onDeath += OnDeath;
             origin.hpComp.onRespawn += OnRespawn;
 
@@ -85,22 +112,52 @@ public class Player_Inventory : NetworkBehaviour
                 ChangeSlot(i); break;
             }
         }
+        if (potion1CooldownCounter > 0) potion1CooldownCounter = Mathf.Max(potion1CooldownCounter - Time.deltaTime, 0.0f);
+        if (potion2CooldownCounter > 0) potion2CooldownCounter = Mathf.Max(potion2CooldownCounter - Time.deltaTime, 0.0f);
+        foreach(var i in Physics2D.CircleCastAll(transform.position, pickupRadius, Vector2.up, 0.0f, pickupLayer))
+        {
+            GameObject hit = i.collider.attachedRigidbody != null ? i.collider.attachedRigidbody.gameObject : i.collider.gameObject;
+            if(hit.TryGetComponent(out Pickup pickup))
+            {
+                pickup.PickupRpc(origin);
+            }
+        }
     }
     void ResetInventory()
     {
-        gas = 0; bolt = 0; ward = 0; potion1 = 0; potion2 = 0;
+        gas.Value = 0; bolt.Value = 0; ward = 0; potion1 = 0; potion2 = 0;
         mortarUnlocked = false;
         ChangeSlot2WeaponRpc(-1);
     }
     void OnDeath()
     {
         slots[slotIndex].OnSlotUnequip();
+        ward = 0; potion1 = 0; potion2 = 0;
+        mortarUnlocked = false;
+        for (int i = 0; i < gas.Value / 10 / 2; i++)
+        {
+            GasPickup tmp = Instantiate(gasPickupPrefab, transform.position, Quaternion.identity);
+            float angle = UnityEngine.Random.Range(0, 360.0f);
+            tmp.rb.linearVelocity = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * dropForce;
+            tmp.NetworkObject.Spawn(true);
+        }
+        gas.Value = 0;
+        for (int i = 0; i < bolt.Value / 10 / 2; i++)
+        {
+            BoltPickup tmp = Instantiate(boltPickupPrefab, transform.position, Quaternion.identity);
+            float angle = UnityEngine.Random.Range(0, 360.0f);
+            tmp.rb.linearVelocity = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * dropForce;
+            tmp.NetworkObject.Spawn(true);
+        }
+        bolt.Value = 0;
     }
     void OnRespawn()
     {
         slots[slotIndex].OnSlotEquip();
+        potion1CooldownCounter = 0.0f;
+        potion2CooldownCounter = 0.0f;
     }
-    void ChangeSlot(int index)
+    public void ChangeSlot(int index)
     {
         if (slotIndex == index || index == 5 && !mortarUnlocked) return;
         slots[slotIndex].OnSlotUnequip();
@@ -179,9 +236,11 @@ public class Player_Inventory : NetworkBehaviour
         public override void OnSlotUpdate()
         {
             base.OnSlotUpdate();
-            if (Input.GetMouseButtonDown(0))
+            if (InputManager.Instance.ItemUseInput() && inventory.potion1 > 0 && inventory.potion1CooldownCounter <= 0.0f)
             {
-
+                inventory.potion1--;
+                inventory.origin.hpComp.hp.Value += inventory.potion1Heal;
+                inventory.potion1CooldownCounter = inventory.potion1Cooldown;
             }
         }
     }
@@ -191,9 +250,11 @@ public class Player_Inventory : NetworkBehaviour
         public override void OnSlotUpdate()
         {
             base.OnSlotUpdate();
-            if (Input.GetMouseButtonDown(0))
+            if (InputManager.Instance.ItemUseInput() && inventory.potion2 > 0 && inventory.potion2CooldownCounter <= 0.0f)
             {
-
+                inventory.potion2--;
+                inventory.origin.attackBuffCounter = inventory.potion2Duration;
+                inventory.potion2CooldownCounter = inventory.potion2Cooldown;
             }
         }
     }

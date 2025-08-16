@@ -5,37 +5,23 @@ using UnityEngine;
 
 public class TeamBase : NetworkBehaviour
 {
-    [SerializeField] NetworkAnimator anim;
-    [SerializeField] UnitTime breakTime;
-
-    [SerializeField] Team m_team;
-    [SerializeField] float m_maxHp = 100.0f;
-    public Team team => m_team;
-    public float maxHp => m_maxHp;
-    public readonly NetworkVariable<float> hp = new(100.0f);
-    private void Awake()
+    [SerializeField] Team team;
+    [SerializeField] TeamShop m_shop;
+    [SerializeField] TeamGenerator m_generator;
+    public TeamShop shop => m_shop;
+    public TeamGenerator generator => m_generator;
+    private void Start()
     {
-        GameManager.Instance.onRoundStart += () => { if (IsOwner) hp.Value = maxHp; };
+        shop.onBreak += Check;
+        generator.onBreak += Check;
     }
-    readonly int damageID = Animator.StringToHash("Damage");
-    readonly int breakID = Animator.StringToHash("Break");
-
-    [Rpc(SendTo.Authority)]
-    public void GetDamageRpc(float damage)
+    void Check()
     {
-        if (hp.Value <= 0) return;
-        anim.SetTrigger(damageID);
-        hp.Value = Mathf.Max(0, hp.Value - damage);
-        if(hp.Value <= 0)
+        if (!HasAuthority) return;
+        if(shop.broken.Value && generator.broken.Value)
         {
-            anim.SetTrigger(breakID);
-            StartCoroutine(Breaking());
+            if (team == Team.Red) GameManager.Instance.WinRound(Team.Blue);
+            if (team == Team.Blue) GameManager.Instance.WinRound(Team.Red);
         }
-    }
-    IEnumerator Breaking()
-    {
-        yield return new WaitForSeconds(breakTime);
-        if (team == Team.Blue) GameManager.Instance.EndRound(Team.Red);
-        if (team == Team.Red) GameManager.Instance.EndRound(Team.Blue);
     }
 }

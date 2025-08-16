@@ -3,7 +3,7 @@ using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
 
-public abstract class Gun : Weapon, Weapon.ICooldownDisplayed
+public abstract class Gun : Weapon
 {
     public Sprite bulletSprite;
 
@@ -15,8 +15,6 @@ public abstract class Gun : Weapon, Weapon.ICooldownDisplayed
 
     private NetworkAnimator animator;
     private float lastShootTime = -Mathf.Infinity;
-
-    public float cooldownFill => 1.0f - Mathf.Max((Time.time - lastShootTime) / shootCooldown, 1.0f);
     public abstract int bullets { get; set; }
     protected override void Awake()
     {
@@ -35,6 +33,6 @@ public abstract class Gun : Weapon, Weapon.ICooldownDisplayed
         animator.SetTrigger("Shoot");
         Bullet bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
         bullet.NetworkObject.Spawn();
-        bullet.Set(bulletSpeed, bulletRange, damage);
+        bullet.Set(bulletSpeed, bulletRange, damage * owner.attackMultiplier);
     }
 }

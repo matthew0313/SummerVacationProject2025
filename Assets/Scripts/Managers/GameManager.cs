@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
+using NetworkAudioManagement;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -17,9 +19,14 @@ public class GameManager : NetworkBehaviour
     [Header("Game")]
     [SerializeField] int intermissionTime = 30;
     [SerializeField] int roundTime = 300;
+    [SerializeField] int roundEndTime = 5;
     [SerializeField] Transform teamRedSpawnpoint, teamBlueSpawnpoint;
 
-    public readonly NetworkVariable<bool> roundInProgress = new(false);
+    [Header("Map")]
+    [SerializeField] TeamBase redBase;
+    [SerializeField] TeamBase blueBase;
+
+    public readonly NetworkVariable<GameState> gameState = new(GameState.Intermission);
     public readonly NetworkVariable<int> timeLeft = new(30);
     public readonly NetworkVariable<bool> timerPaused = new(false);
 
@@ -38,6 +45,12 @@ public class GameManager : NetworkBehaviour
         foreach (var i in players) if (i.OwnerClientId == clientID) return i;
         return null;
     }
+    public TeamBase GetBase(Team team)
+    {
+        if (team == Team.Red) return redBase;
+        if (team == Team.Blue) return blueBase;
+        return null;
+    }
 
     float counter = 0.0f;
     private void Update()
@@ -51,20 +64,26 @@ public class GameManager : NetworkBehaviour
                 counter -= 1.0f;
                 if(--timeLeft.Value <= 0)
                 {
-                    if (roundInProgress.Value) EndRound(Team.None);
-                    else StartRound();
+                    switch (gameState.Value)
+                    {
+                        case GameState.Intermission: StartRound(); break;
+                        case GameState.RoundInProgress: WinRound(Team.None); break;
+                        case GameState.RoundCompleted: EndRound();  break;
+                    }
                 }
             }
         }
     }
     void StartRound()
     {
+        if (!HasAuthority) return;
         if (players.Count < 2)
         {
             timeLeft.Value = intermissionTime; return;
         }
-        roundInProgress.Value = true;
+        gameState.Value = GameState.RoundInProgress;
         timeLeft.Value = roundTime;
+        NetworkAudioManager.Instance.ChangeMusic("InGame");
         List<Player> playerCache = players.ToList();
         List<Player> teamRed = new();
         int tmp = playerCache.Count;
@@ -94,16 +113,42 @@ public class GameManager : NetworkBehaviour
         }
         OnRoundStartRpc();
     }
-    public event Action onRoundStart;
-    public event Action<RoundResult> onRoundEnd;
+    public event Action onRoundStart, onRoundEnd;
+    public event Action<RoundResult> onRoundComplete;
 
-    [Rpc(SendTo.ClientsAndHost)]
+    [Rpc(SendTo.Everyone)]
     public void OnRoundStartRpc() => onRoundStart?.Invoke();
-    public void EndRound(Team winningTeam)
+    public void WinRound(Team winningTeam)
     {
-        if (!roundInProgress.Value) return;
-        roundInProgress.Value = false;
-        timeLeft.Value = intermissionTime;
+        if (!HasAuthority || gameState.Value != GameState.RoundInProgress) return;
+        gameState.Value = GameState.RoundCompleted;
+        timeLeft.Value = roundEndTime;
+        foreach(var i in players)
+        {
+            if (i.inRound.Value)
+            {
+                var target = RpcTarget.Single(i.OwnerClientId, RpcTargetUse.Temp);
+                if (winningTeam == Team.None)
+                {
+                    OnRoundCompleteRpc(RoundResult.Tied, target);
+                }
+                else
+                {
+                    if(i.team.Value == winningTeam) OnRoundCompleteRpc(RoundResult.Won, target);
+                    else OnRoundCompleteRpc(RoundResult.Lost, target);
+                }
+                i.SetTeamRpc(Team.None);
+            }
+        }
+    }
+    [Rpc(SendTo.SpecifiedInParams)]
+    public void OnRoundCompleteRpc(RoundResult result, RpcParams rpcParams) => onRoundComplete?.Invoke(result);
+    public void EndRound()
+    {
+        if (!HasAuthority) return;
+        gameState.Value = GameState.Intermission;
+        timeLeft.Value = roundEndTime;
+        NetworkAudioManager.Instance.ChangeMusic("Intermission");
         foreach(var i in players)
         {
             if (i.inRound.Value)
@@ -112,23 +157,19 @@ public class GameManager : NetworkBehaviour
                 i.SetInRoundRpc(false);
                 i.hpComp.SetRespawnPosRpc(lobbySpawnPoint.position);
                 i.TeleportRpc(lobbySpawnPoint.position);
-
-                var target = RpcTarget.Single(i.OwnerClientId, RpcTargetUse.Temp);
-                if (winningTeam == Team.None)
-                {
-                    OnRoundEndRpc(RoundResult.Tied, target);
-                }
-                else
-                {
-                    if(i.team.Value == winningTeam) OnRoundEndRpc(RoundResult.Won, target);
-                    else OnRoundEndRpc(RoundResult.Lost, target);
-                }
-                i.SetTeamRpc(Team.None);
             }
         }
     }
-    [Rpc(SendTo.SpecifiedInParams)]
-    public void OnRoundEndRpc(RoundResult result, RpcParams rpcParams) => onRoundEnd?.Invoke(result);
+    [Rpc(SendTo.Everyone)]
+    public void OnRoundEndRpc() => onRoundEnd?.Invoke();
+
+}
+[System.Serializable]
+public enum GameState
+{
+    Intermission,
+    RoundInProgress,
+    RoundCompleted
 }
 [System.Serializable]
 public enum RoundResult

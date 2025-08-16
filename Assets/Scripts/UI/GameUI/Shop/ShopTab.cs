@@ -6,12 +6,10 @@ using System.Collections.Generic;
 
 public class ShopTab : Tab
 {
-    [Header("ShopTab")]
-    [SerializeField] List<ShopDealUI> deals;
-
     [Header("Tween")]
     [SerializeField] RectTransform tweenTarget;
     [SerializeField] float tweenTime = 0.5f;
+    [SerializeField] TMP_Text gasText, boltText;
     Tween tween;
     float tweenCounter = 0.0f;
     public override void OpenTab()
@@ -34,5 +32,10 @@ public class ShopTab : Tab
         base.CloseTab();
         tween.OnStepComplete(() => gameObject.SetActive(false));
         tween.PlayBackwards();
+    }
+    private void Update()
+    {
+        gasText.text = Player.localPlayer.inventory.gas.Value.ToString();
+        boltText.text = Player.localPlayer.inventory.bolt.Value.ToString();
     }
 }

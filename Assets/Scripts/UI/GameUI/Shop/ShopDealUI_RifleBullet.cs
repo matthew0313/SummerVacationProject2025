@@ -11,12 +11,12 @@ public class ShopDealUI_RifleBullet : ShopDealUI
     [SerializeField] int ammoAdded;
     protected override void Purchase()
     {
-        if (player.inventory.gas < gasCost)
+        if (player.inventory.gas.Value < gasCost)
         {
             MessageManager.Instance.SendMessageToPlayer("<color=#FF0000>가스가 부족합니다.</color>", Player.localPlayer);
             return;
         }
-        player.inventory.gas -= gasCost;
+        player.inventory.gas.Value -= gasCost;
         player.inventory.rifleBullets += ammoAdded;
     }
 }

@@ -17,9 +17,9 @@ TagManager:
   - Ward
   - Bullets
   - Hitbox
-  - Detector
-  - 
-  - 
+  - PlayerDetector
+  - Pickup
+  - Mortar
   - 
   - 
   - 

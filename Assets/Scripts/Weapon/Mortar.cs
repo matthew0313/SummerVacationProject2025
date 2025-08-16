@@ -1,18 +1,24 @@
 using UnityEngine;
+using System.Collections.Generic;
 using System.Collections;
 using Unity.Netcode.Components;
+using System.Net.NetworkInformation;
+using NetworkAudioManagement;
 
-public class Mortar : Weapon, Weapon.ICooldownDisplayed
+public class Mortar : Weapon
 {
-    [SerializeField] float shootCooldown = 30.0f;
     [SerializeField] Transform firePoint;
+    [SerializeField] MortarMarker markerPrefab;
     [SerializeField] MortarRocket rocket;
+    [SerializeField] float shootTime = 2.0f, shootEndlag = 1.0f;
+    [SerializeField] float shootSpeed = 0.3f;
+    [SerializeField] string fireSound;
+    [SerializeField] float fireSoundMinDist = 20.0f, fireSoundMaxDist = 40.0f;
 
     private NetworkAnimator animator;
-    private TeamBase targetBase;
-    private float lastShootTime = -Mathf.Infinity;
-
-    public float cooldownFill => 1.0f - Mathf.Max((Time.time - lastShootTime) / shootCooldown, 1.0f);
+    readonly List<MortarTarget> targets = new();
+    MortarTarget currentTarget;
+    MortarMarker marker;
 
     private bool isShooting = false;
     private Coroutine ShootCoroutine;
@@ -21,84 +27,110 @@ public class Mortar : Weapon, Weapon.ICooldownDisplayed
         base.Awake();
         animator = GetComponent<NetworkAnimator>();
     }
+    void ChangeTarget(MortarTarget target)
+    {
+        if (currentTarget == target) return;
+        if(target == null)
+        {
+            marker.Hide();
+        }
+        else
+        {
+            marker.transform.position = targets[0].transform.position;
+            marker.Show();
+        }
+    }
+    protected override void Update()
+    {
+        base.Update();
+        targets.RemoveAll(item => item.broken.Value);
+        if (!isShooting)
+        {
+            if (targets.Count > 0)
+            {
+                targets.Sort((a, b) => Vector2.Distance(transform.position, a.transform.position).CompareTo(Vector2.Distance(transform.position, b.transform.position)));
+                ChangeTarget(targets[0]);
+            }
+            else ChangeTarget(null);
+        }
+    }
 
     public override void Shoot()
     {
-        if (Time.time < lastShootTime + shootCooldown || targetBase == null || isShooting)
+        if (currentTarget == null || isShooting)
             return;
 
-        ShootCoroutine = StartCoroutine(ShootAfterDelay(3f));
+        ShootCoroutine = StartCoroutine(ShootAfterDelay());
     }
 
-    private IEnumerator ShootAfterDelay(float delay)
+    private IEnumerator ShootAfterDelay()
     {
+        owner.inventory.mortarUnlocked = false;
+        owner.speedMultiplier *= shootSpeed;
         isShooting = true;
         animator.Animator.SetBool("Shooting", true);
-        float counter = 0.0f;
-        while(counter < delay)
-        {
-            yield return null;
-            counter += Time.deltaTime;
-            if (targetBase == null)
-            {
-                isShooting = true;
-                animator.Animator.SetBool("Shooting", false);
-                yield break;
-            }
-        }
+        yield return new WaitForSeconds(shootTime);
         animator.SetTrigger("Shoot");
-        isShooting = false;
         animator.Animator.SetBool("Shooting", false);
+        owner.inventory.mortarUnlocked = false;
+        NetworkAudioManager.Instance.PlaySound(fireSound)
+            .SetDistance(firePoint.position, fireSoundMinDist, fireSoundMaxDist);
 
-        Vector2 firePos = firePoint.position, targetPos = targetBase.transform.position;
+        Vector2 firePos = firePoint.position, targetPos = currentTarget.transform.position;
         MortarRocket rocket = Instantiate(this.rocket, firePos, Quaternion.Euler(0, 0, Mathf.Atan2(targetPos.y - firePos.y, targetPos.x - firePos.x) * Mathf.Rad2Deg));
         rocket.NetworkObject.Spawn(true);
-        rocket.Set(targetBase, 2.0f);
+        rocket.Set(currentTarget, 2.0f);
+
+        yield return new WaitForSeconds(shootEndlag);
+        StopShooting();
+    }
+    void StopShooting()
+    {
+        if (!isShooting) return;
+        StopCoroutine(ShootCoroutine);
+        isShooting = false;
+        owner.speedMultiplier /= shootSpeed;
+        animator.Animator.SetBool("Shooting", false);
+        owner.inventory.ChangeSlot(0);
+
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        GameObject hitObject = other.attachedRigidbody.gameObject;
+        GameObject hitObject = other.attachedRigidbody != null ? other.attachedRigidbody.gameObject : other.gameObject;
 
-        if (hitObject.TryGetComponent(out TeamBase teamBase) && teamBase.team != owner.team.Value)
+        if (hitObject.TryGetComponent(out MortarTarget target) && !target.broken.Value && target.team != owner.team.Value)
         {
-            targetBase = teamBase;
+            targets.Add(target);
         }
     }
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        GameObject hitObject = other.attachedRigidbody.gameObject;
+        GameObject hitObject = other.attachedRigidbody != null ? other.attachedRigidbody.gameObject : other.gameObject;
 
-        if (hitObject.TryGetComponent(out TeamBase teambase) && teambase == targetBase)
+        if (hitObject.TryGetComponent(out MortarTarget target) && targets.Contains(target))
         {
-            targetBase = null;
+            targets.Remove(target);
         }
     }
 
     private void OnDamageTake(float damage)
     {
-        if (isShooting)
-        {
-            StopCoroutine(ShootCoroutine);
-            isShooting = false;
-            animator.Animator.SetBool("Shooting", false);
-        }
+        if (isShooting) StopShooting();
     }
     public override void OnEquipped()
     {
         base.OnEquipped();
+        if (marker == null) marker = Instantiate(markerPrefab);
         owner.hpComp.onDamage += OnDamageTake;
     }
 
     public override void OnUnequipped()
     {
-        base.OnUnequipped();
+        if (isShooting) StopShooting();
+        marker.Hide();
         owner.hpComp.onDamage -= OnDamageTake;
-        if (isShooting)
-        {
-            StopCoroutine(ShootCoroutine);
-            isShooting = false;
-        }
+        base.OnUnequipped();
     }
 }

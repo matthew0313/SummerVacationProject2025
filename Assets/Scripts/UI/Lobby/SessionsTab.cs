@@ -32,8 +32,8 @@ public class SessionsTab : Tab
                 .SetEase(Ease.OutCirc)
                 .OnUpdate(() =>
                 {
-                    tweenTarget.anchorMin = new Vector2(0, 1.0f - tweenCounter);
-                    tweenTarget.anchorMax = new Vector2(1.0f, 2.0f - tweenCounter);
+                    tweenTarget.anchorMin = new Vector2(0.5f, 1.5f - tweenCounter);
+                    tweenTarget.anchorMax = new Vector2(0.5f, 1.5f - tweenCounter);
                 });
         gameObject.SetActive(true);
         tween.OnStepComplete(null);

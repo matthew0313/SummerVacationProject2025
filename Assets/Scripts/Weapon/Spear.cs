@@ -42,7 +42,7 @@ public class Spear : Weapon
         {
             if (owner.GetRelation(damagable.owner) == Relation.Enemy || damagable is Ward ward && ward.owner == owner)
             {
-                damagable.GetDamage(new() { amount = damage, damageGiverClientID = OwnerClientId });
+                damagable.GetDamage(new() { amount = damage * owner.attackMultiplier, damageGiverClientID = OwnerClientId });
             }
         }
     }
