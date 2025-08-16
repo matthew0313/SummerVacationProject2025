@@ -32,8 +32,10 @@ public class Player : Entity
 
     [Header("Potions")]
     [SerializeField] float attackBuffMultiplier = 1.5f;
+    [SerializeField] GameObject attackBuffIndicator;
+    public readonly NetworkVariable<bool> attackBuffed = new(false);
     public float attackBuffCounter = 0.0f;
-    public float attackMultiplier => attackBuffCounter > 0.0f ? attackBuffMultiplier : 1.0f;
+    public float attackMultiplier => attackBuffed.Value ? attackBuffMultiplier : 1.0f;
 
     public readonly NetworkVariable<Team> team = new(Team.None);
     public readonly NetworkVariable<bool> PVP = new(false), inRound = new(false);
@@ -53,6 +55,12 @@ public class Player : Entity
     bool isDead => hpComp.isDead.Value;
     TopLayer topLayer;
 
+    public void AttackBuff(float duration)
+    {
+        if (!IsOwner) return;
+        attackBuffed.Value = true;
+        attackBuffCounter = duration;
+    }
     private void Awake()
     {
         hpComp = GetComponent<Player_HpComp>();
@@ -64,6 +72,8 @@ public class Player : Entity
     }
     private void Start()
     {
+        attackBuffed.OnValueChanged += (prev, val) => attackBuffIndicator.gameObject.SetActive(val);
+        attackBuffIndicator.gameObject.SetActive(attackBuffed.Value);
         if (IsLocalPlayer)
         {
             localPlayer = this;
@@ -87,9 +97,13 @@ public class Player : Entity
         {
             topLayer.OnStateUpdate();
             UpdateRotation();
-            if (attackBuffCounter > 0) attackBuffCounter = Mathf.Max(attackBuffCounter - Time.deltaTime, 0.0f);
+            if (attackBuffed.Value)
+            {
+                attackBuffCounter = Mathf.Max(attackBuffCounter - Time.deltaTime, 0.0f);
+                if (attackBuffCounter <= 0.0f) attackBuffed.Value = false;
+            }
         }
-        if (localPlayer != null) anim.SetInteger(relationID, (int)localPlayer.GetRelation(this));
+        if (localPlayer != null) anim.SetFloat(relationID, (int)localPlayer.GetRelation(this));
         
     }
     private void OnEnable()
@@ -164,12 +178,12 @@ public class Player : Entity
         class Moving : State<Player>
         {
             public Moving(Player origin, Layer<Player> parent) : base(origin, parent) { }
-            PlayingSound footsteps = null;
             public override void OnStateEnter()
             {
                 base.OnStateEnter();
                 origin.animations.isWalking.Value = true;
-                footsteps = NetworkAudioManager.Instance.PlaySound(origin.footstepSound).SetDistance(origin, origin.footstepDistMin, origin.footstepDistMax).SetLoop(true);
+                footstepCounter = 0.0f;
+                NetworkAudioManager.Instance.PlaySound(origin.footstepSound).SetDistance(origin, origin.footstepDistMin, origin.footstepDistMax);
             }
             float footstepCounter = 0.0f;
             public override void OnStateUpdate()
@@ -184,14 +198,13 @@ public class Player : Entity
                 if(footstepCounter >= origin.footstepRate)
                 {
                     footstepCounter -= origin.footstepRate;
-                    footsteps.Restart();
+                    NetworkAudioManager.Instance.PlaySound(origin.footstepSound).SetDistance(origin, origin.footstepDistMin, origin.footstepDistMax);
                 }
             }
             public override void OnStateExit()
             {
                 base.OnStateExit();
                 origin.animations.isWalking.Value = false;
-                footsteps.Stop();
             }
         }
         class Dead : State<Player>

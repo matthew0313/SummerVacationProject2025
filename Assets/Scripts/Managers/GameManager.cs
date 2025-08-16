@@ -159,7 +159,7 @@ public class GameManager : NetworkBehaviour
                 i.TeleportRpc(lobbySpawnPoint.position);
             }
         }
-        onRoundEnd?.Invoke();
+        OnRoundEndRpc();
     }
     [Rpc(SendTo.Everyone)]
     public void OnRoundEndRpc() => onRoundEnd?.Invoke();

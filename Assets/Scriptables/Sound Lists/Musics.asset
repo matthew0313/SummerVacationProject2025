@@ -16,7 +16,7 @@ MonoBehaviour:
   - name: Intermission
     sound:
       clip: {fileID: 8300000, guid: 8fedbb08c77670649875e27fbdb9e322, type: 3}
-      volume: 0.2
+      volume: 0.3
       pitch: 1
       startTime: 0
       foldout: 1

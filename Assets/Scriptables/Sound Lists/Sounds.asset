@@ -16,37 +16,44 @@ MonoBehaviour:
   - name: Knife Slash
     sound:
       clip: {fileID: 8300000, guid: c557d1071cf39fa41a645d634b3ebbde, type: 3}
-      volume: 0.8
+      volume: 1
       pitch: 1
       startTime: 0.2
       foldout: 1
   - name: Knife Hit
     sound:
       clip: {fileID: 8300000, guid: 8c6ff255a63dd7043a179ba1d9953b2b, type: 3}
-      volume: 0.8
+      volume: 1
       pitch: 1
       startTime: 0
       foldout: 1
   - name: Pistol Fire
     sound:
       clip: {fileID: 8300000, guid: 1c0d174090f5ad44f95fc4b3146d8d1b, type: 3}
-      volume: 0.3
+      volume: 1
       pitch: 1
       startTime: 0.05
       foldout: 1
   - name: AK47 Fire
     sound:
       clip: {fileID: 8300000, guid: f0bfc2dd25f4b6c4aa65b7c8ddee832c, type: 3}
-      volume: 0.5
+      volume: 1
       pitch: 1
       startTime: 0.05
       foldout: 1
   - name: Mortar Fire
     sound:
       clip: {fileID: 8300000, guid: 581727656b5cedc428386298cc86a58b, type: 3}
-      volume: 0.6
+      volume: 1
       pitch: 1
       startTime: 5
+      foldout: 1
+  - name: Explosion
+    sound:
+      clip: {fileID: 8300000, guid: 9985ebcbd6fd1cf40b475280b6095569, type: 3}
+      volume: 0.9
+      pitch: 1
+      startTime: 0
       foldout: 1
   - name: Footsteps
     sound:
@@ -58,14 +65,14 @@ MonoBehaviour:
   - name: Victory
     sound:
       clip: {fileID: 8300000, guid: e7c66292e26c37e4487fb975398f908b, type: 3}
-      volume: 0.5
+      volume: 0.6
       pitch: 1
       startTime: 0
       foldout: 1
   - name: Pickup
     sound:
       clip: {fileID: 8300000, guid: 7840f44ae169f454ab8f255ed8786b79, type: 3}
-      volume: 0.3
+      volume: 0.9
       pitch: 1
       startTime: 0.5
       foldout: 1

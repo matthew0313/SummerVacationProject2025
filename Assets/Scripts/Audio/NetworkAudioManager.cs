@@ -129,6 +129,7 @@ namespace NetworkAudioManagement
                 musicSource.time = currentMusic.startTime;
             }
         }
+        public PlayingSound PlaySoundLocal(string soundName) => PlaySound(soundName, RpcTarget.Me);
         public PlayingSound PlaySound(string soundName, RpcParams rpcParams = new())
         {
             for (int i = 0; i < sounds.Count; i++)
@@ -156,6 +157,7 @@ namespace NetworkAudioManagement
         [Rpc(SendTo.NotMe, AllowTargetOverride = true)]
         void PlaySoundRpc(ulong soundID, int index, RpcParams rpcParams)
         {
+            if (rpcParams.Receive.SenderClientId == NetworkManager.LocalClientId) return;
             PlayingSound tmp = new(
                 this,
                 rpcParams.Receive.SenderClientId,
@@ -186,12 +188,6 @@ namespace NetworkAudioManagement
             sound.source.Stop();
             audioSourcePool.ReleaseObject(sound.source);
             removeQueue.Add(soundID);
-        }
-        [Rpc(SendTo.NotMe)]
-        internal void SetLoopRpc(ulong soundID, bool loop)
-        {
-            if (!playingSounds.TryGetValue(soundID, out PlayingSound sound)) return;
-            sound.SetLoop(loop);
         }
         [Rpc(SendTo.NotMe)]
         internal void SetVolumeRpc(ulong soundID, float volume)
@@ -226,8 +222,8 @@ namespace NetworkAudioManagement
         internal float GetVolume(VolumeGroup group)
         {
             float val = 1.0f;
-            if ((group | VolumeGroup.SFX) != 0) val *= Settings.SFXVolume;
-            if ((group | VolumeGroup.BGM) != 0) val *= Settings.BGMVolume;
+            if ((group & VolumeGroup.SFX) != 0) val *= Settings.SFXVolume;
+            if ((group & VolumeGroup.BGM) != 0) val *= Settings.BGMVolume;
             return val;
         }
     }
@@ -258,14 +254,6 @@ namespace NetworkAudioManagement
             this.volume = volume;
             return this;
         }
-        public bool loop { get; private set; } = false;
-        public PlayingSound SetLoop(bool loop)
-        {
-            if (isOwner) manager.SetLoopRpc(id, loop);
-            this.loop = loop;
-            return this;
-        }
-
         public bool hasDistance { get; private set; } = false;
         internal NetworkBehaviour locationSource;
         internal Vector2 location;
@@ -313,11 +301,7 @@ namespace NetworkAudioManagement
                 else volume *= 0.0f;
             }
             source.volume = volume;
-            if (!source.isPlaying && isOwner)
-            {
-                if (!loop) Stop();
-                else Restart();
-            }
+            if (!source.isPlaying && isOwner) Stop();
         }
         public void Stop()
         {

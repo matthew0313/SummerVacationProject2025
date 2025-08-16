@@ -11,6 +11,7 @@ public class TeamActivator : MonoBehaviour, ILocalPlayerSpawnCallback
     {
         localPlayer.team.OnValueChanged += OnTeamChange;
         OnTeamChange(Team.None, localPlayer.team.Value);
+        Debug.Log("RRRRR");
     }
     void OnTeamChange(Team prev, Team team)
     {

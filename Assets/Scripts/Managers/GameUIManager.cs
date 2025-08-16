@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using NetworkAudioManagement;
 using TMPro;
 using Unity.Netcode;
 using Unity.VisualScripting;
@@ -31,6 +32,9 @@ public class GameUIManager : TabOpener
     public MessageUI messageUI => m_messageUI;
     public InventoryUI inventoryUI => m_inventoryUI;
 
+    [Header("Results")]
+    [SerializeField] string victorySound;
+
     readonly int tiedID = Animator.StringToHash("Tied");
     readonly int wonID = Animator.StringToHash("Won");
     readonly int lostID = Animator.StringToHash("Lost");
@@ -40,7 +44,11 @@ public class GameUIManager : TabOpener
         GameManager.Instance.onRoundComplete += result =>
         {
             if (result == RoundResult.Tied) anim.SetTrigger(tiedID);
-            else if (result == RoundResult.Won) anim.SetTrigger(wonID);
+            else if (result == RoundResult.Won)
+            {
+                anim.SetTrigger(wonID);
+                NetworkAudioManager.Instance.PlaySound(victorySound);
+            }
             else if(result == RoundResult.Lost) anim.SetTrigger(lostID);
         };
     }

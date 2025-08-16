@@ -253,7 +253,7 @@ public class Player_Inventory : NetworkBehaviour
             if (InputManager.Instance.ItemUseInput() && inventory.potion2 > 0 && inventory.potion2CooldownCounter <= 0.0f)
             {
                 inventory.potion2--;
-                inventory.origin.attackBuffCounter = inventory.potion2Duration;
+                inventory.origin.AttackBuff(inventory.potion2Duration);
                 inventory.potion2CooldownCounter = inventory.potion2Cooldown;
             }
         }

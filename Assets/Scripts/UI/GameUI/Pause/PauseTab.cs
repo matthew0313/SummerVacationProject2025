@@ -47,6 +47,7 @@ public class PauseTab : Tab
         playerNameField.onEndEdit.AddListener(OnPlayerNameFieldUpdate);
         exitButton.onClick.AddListener(ExitSession);
         SessionManager.Instance.onPlayerNameChange += OnPlayerNameChange;
+        OnPlayerNameChange(SessionManager.Instance.playerName);
         sessionIDText.text = SessionManager.Instance.activeSession.Id;
     }
     private void OnDisable()

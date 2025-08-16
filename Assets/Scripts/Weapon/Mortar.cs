@@ -60,10 +60,10 @@ public class Mortar : Weapon
 
                     Vector2 dir = (a.transform.position - firePoint.position).normalized;
                     float dist = Vector2.Distance(a.transform.position, firePoint.position);
-                    bool aBlocked = Physics2D.Raycast(firePoint.position, dir, dist, LayerMask.NameToLayer("Map"));
+                    bool aBlocked = Physics2D.Raycast(firePoint.position, dir, dist, LayerMask.GetMask("Map"));
                     dir = (b.transform.position - firePoint.position).normalized;
                     dist = Vector2.Distance(b.transform.position, firePoint.position);
-                    bool bBlocked = Physics2D.Raycast(firePoint.position, dir, dist, LayerMask.NameToLayer("Map"));
+                    bool bBlocked = Physics2D.Raycast(firePoint.position, dir, dist, LayerMask.GetMask("Map"));
                     if (aBlocked)
                     {
                         if (bBlocked) return 0;
@@ -77,7 +77,8 @@ public class Mortar : Weapon
                 var tmp = targets[0];
                 Vector2 dir = (tmp.transform.position - firePoint.position).normalized;
                 float dist = Vector2.Distance(tmp.transform.position, firePoint.position);
-                bool blocked = Physics2D.Raycast(firePoint.position, dir, dist, LayerMask.NameToLayer("Map"));
+                bool blocked = Physics2D.Raycast(firePoint.position, dir, dist, LayerMask.GetMask("Map")).transform != null;
+                Debug.DrawLine(firePoint.position, (Vector2)firePoint.position + dir * dist, blocked ? Color.green : Color.red, 1.0f);
 
                 if (!tmp.broken.Value && !blocked) ChangeTarget(targets[0]);
                 else ChangeTarget(null);
@@ -128,6 +129,7 @@ public class Mortar : Weapon
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        if (!IsOwner) return;
         GameObject hitObject = other.attachedRigidbody != null ? other.attachedRigidbody.gameObject : other.gameObject;
 
         if (hitObject.TryGetComponent(out MortarTarget target) && target.team != owner.team.Value)
@@ -138,6 +140,7 @@ public class Mortar : Weapon
 
     private void OnTriggerExit2D(Collider2D other)
     {
+        if (!IsOwner) return;
         GameObject hitObject = other.attachedRigidbody != null ? other.attachedRigidbody.gameObject : other.gameObject;
 
         if (hitObject.TryGetComponent(out MortarTarget target) && targets.Contains(target))
