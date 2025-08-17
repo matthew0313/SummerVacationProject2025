@@ -44,6 +44,8 @@ public class PauseTab : Tab
     }
     private void OnEnable()
     {
+        playerNameField.onSelect.AddListener(DisableInput);
+        playerNameField.onDeselect.AddListener(EnableInput);
         playerNameField.onEndEdit.AddListener(OnPlayerNameFieldUpdate);
         exitButton.onClick.AddListener(ExitSession);
         SessionManager.Instance.onPlayerNameChange += OnPlayerNameChange;
@@ -52,10 +54,14 @@ public class PauseTab : Tab
     }
     private void OnDisable()
     {
+        playerNameField.onSelect.RemoveListener(DisableInput);
+        playerNameField.onDeselect.RemoveListener(EnableInput);
         playerNameField.onEndEdit.RemoveListener(OnPlayerNameFieldUpdate);
         exitButton.onClick.RemoveListener(ExitSession);
         SessionManager.Instance.onPlayerNameChange -= OnPlayerNameChange;
     }
+    void EnableInput(string val) => InputManager.Instance.inputEnabled = true;
+    void DisableInput(string val) => InputManager.Instance.inputEnabled = false;
     void OnPlayerNameFieldUpdate(string text) => SessionManager.Instance.SetPlayerName(text);
     void OnPlayerNameChange(string name) => playerNameField.text = name;
     void ExitSession() => SessionManager.Instance.LeaveSession();

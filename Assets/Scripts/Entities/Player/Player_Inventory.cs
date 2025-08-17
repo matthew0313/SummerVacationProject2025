@@ -1,9 +1,5 @@
 using System;
-using System.Linq;
-using TMPro.EditorUtilities;
 using Unity.Netcode;
-using Unity.Netcode.Components;
-using UnityEditor.Rendering;
 using UnityEngine;
 public class Player_Inventory : NetworkBehaviour
 {

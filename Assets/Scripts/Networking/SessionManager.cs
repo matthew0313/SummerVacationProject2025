@@ -43,6 +43,7 @@ public class SessionManager : MonoBehaviour
     }
     public async void SetPlayerName(string playerName)
     {
+        Debug.Log(playerName);
         await AuthenticationService.Instance.UpdatePlayerNameAsync(playerName);
         onPlayerNameChange?.Invoke(playerName);
     }

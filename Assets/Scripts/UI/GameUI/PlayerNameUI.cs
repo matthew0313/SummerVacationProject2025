@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using Unity.Netcode;
 using Unity.Collections;
+using UnityEngine.InputSystem;
 
 public class PlayerNameUI : NetworkBehaviour
 {
@@ -11,7 +12,11 @@ public class PlayerNameUI : NetworkBehaviour
     public readonly NetworkVariable<FixedString512Bytes> playerName = new();
     private void Start()
     {
-        playerName.OnValueChanged += (prev, val) => playerNameText.text = val.ToString();
+        playerName.OnValueChanged += (prev, val) =>
+        {
+            playerNameText.text = val.ToString();
+            Debug.Log(val.ToString());
+        };
         playerNameText.text = playerName.Value.ToString();
         if (IsOwner)
         {
@@ -27,17 +32,16 @@ public class PlayerNameUI : NetworkBehaviour
     }
     private void OnEnable()
     {
-        if (IsOwner)
-        {
-            SessionManager.Instance.onPlayerNameChange += OnPlayerNameChange;
-        }
+        SessionManager.Instance.onPlayerNameChange += OnPlayerNameChange;
     }
     private void OnDisable()
     {
-        if (IsOwner)
-        {
-            SessionManager.Instance.onPlayerNameChange -= OnPlayerNameChange;
-        }
+        SessionManager.Instance.onPlayerNameChange -= OnPlayerNameChange;
     }
-    void OnPlayerNameChange(string name) => playerName.Value = name;
+    void OnPlayerNameChange(string name)
+    {
+        if (!IsOwner) return;
+        Debug.Log("RRRR");
+        playerName.Value = name;
+    }
 }
