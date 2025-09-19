@@ -17,8 +17,10 @@ public class GameUIManager : TabOpener
     [Header("Tabs")]
     [SerializeField] ShopTab m_shopTab;
     [SerializeField] PauseTab m_pauseTab;
+    [SerializeField] TutorialTab m_tutorialTab;
     public ShopTab shopTab => m_shopTab;
     public PauseTab pauseTab => m_pauseTab;
+    public TutorialTab tutorialTab => m_tutorialTab;
 
     [Header("Hp")]
     [SerializeField] TMP_Text hpText;
@@ -51,10 +53,15 @@ public class GameUIManager : TabOpener
             }
             else if(result == RoundResult.Lost) anim.SetTrigger(lostID);
         };
+        OpenTab(tutorialTab);
     }
     private void Update()
     {
-        if (InputManager.Instance.EscapeInput()) OpenTab(pauseTab);
+        if (InputManager.Instance.EscapeInput())
+        {
+            if (currentTab != null) CloseTab();
+            else OpenTab(pauseTab);
+        }
         if(Player.localPlayer != null)
         {
             hpText.text = $"{Player.localPlayer.hpComp.hp.Value} | {Player.localPlayer.hpComp.maxHp.Value}";

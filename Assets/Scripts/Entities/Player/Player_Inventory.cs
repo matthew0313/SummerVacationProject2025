@@ -122,6 +122,7 @@ public class Player_Inventory : NetworkBehaviour
     void ResetInventory()
     {
         gas.Value = 0; bolt.Value = 0; ward = 0; potion1 = 0; potion2 = 0;
+        pistolBullets = 0; rifleBullets = 0;
         mortarUnlocked = false;
         ChangeSlot2WeaponRpc(-1);
     }
@@ -146,6 +147,7 @@ public class Player_Inventory : NetworkBehaviour
             tmp.NetworkObject.Spawn(true);
         }
         bolt.Value = 0;
+        pistolBullets = 0; rifleBullets = 0;
     }
     void OnRespawn()
     {
