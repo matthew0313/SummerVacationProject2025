@@ -6,10 +6,18 @@ public class TeamShop : MortarTarget
 {
     [SerializeField] NetworkAnimator anim;
     [SerializeField] int regenTime = 30;
+    [SerializeField] float interactRange = 3.0f;
+    [SerializeField] GameObject interactIndicator;
+    [SerializeField] KeyCode interactKey = KeyCode.E;
     public readonly NetworkVariable<int> regenCounter = new(30);
     ShopTab shopTab => GameUIManager.Instance.shopTab;
     readonly int brokenID = Animator.StringToHash("Broken");
 
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position, interactRange);
+    }
     private void Start()
     {
         GameManager.Instance.onRoundEnd += () =>
@@ -29,24 +37,6 @@ public class TeamShop : MortarTarget
         }
         if(GameUIManager.Instance.currentTab == shopTab) GameUIManager.Instance.CloseTab();
     }
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (Player.localPlayer == null || broken.Value) return;
-        GameObject hit = collision.attachedRigidbody != null ? collision.attachedRigidbody.gameObject : collision.gameObject;
-        if(hit == Player.localPlayer.gameObject && !GameUIManager.Instance.isTabOpen)
-        {
-            GameUIManager.Instance.OpenTab(shopTab);
-        }
-    }
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (Player.localPlayer == null) return;
-        GameObject hit = collision.attachedRigidbody != null ? collision.attachedRigidbody.gameObject : collision.gameObject;
-        if (hit == Player.localPlayer.gameObject && GameUIManager.Instance.currentTab == shopTab)
-        {
-            GameUIManager.Instance.CloseTab();
-        }
-    }
     float counter = 0.0f;
     private void Update()
     {
@@ -63,6 +53,20 @@ public class TeamShop : MortarTarget
                     anim.SetBool(brokenID, false);
                 }
             }
+            interactIndicator.SetActive(false);
+        }
+        else
+        {
+            float dist = Vector2.Distance(transform.position, Player.localPlayer.transform.position);
+            if (dist <= interactRange)
+            {
+                interactIndicator.SetActive(true);
+                if (Input.GetKeyDown(interactKey))
+                {
+                    GameUIManager.Instance.OpenTab(GameUIManager.Instance.shopTab);
+                }
+            }
+            else interactIndicator.SetActive(false);
         }
     }
 }

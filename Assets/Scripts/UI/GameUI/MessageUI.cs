@@ -6,6 +6,7 @@ using Unity.Collections;
 using Unity.Services.Authentication;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
+using UnityEditor.Experimental.GraphView;
 
 public class MessageUI : MonoBehaviour
 {
@@ -36,21 +37,123 @@ public class MessageUI : MonoBehaviour
         EventSystem.current.SetSelectedGameObject(null);
         if (msg != string.Empty)
         {
-            if (msg.StartsWith("/t "))
+            if (msg.StartsWith("/"))
             {
-                msg = msg.Substring(3);
-                if(Player.localPlayer.team.Value == Team.None)
+                if (msg.StartsWith("/t "))
                 {
-                    MessageManager.Instance.SendMessageToPlayer("<color=#FF0000>현재 팀에 속해 있지 않습니다.</color>", Player.localPlayer);
-                    return;
-                }
-                foreach (var player in GameManager.Instance.players)
-                {
-                    if (player.team.Value != Team.None && player.team.Value == Player.localPlayer.team.Value)
+                    if (Player.localPlayer.team.Value == Team.None)
                     {
-                        MessageManager.Instance.SendMessageToPlayer($"<b>[팀 채팅] {SessionManager.Instance.playerName}</b>: {msg}", player);
+                        MessageManager.Instance.SendMessageToPlayer("<color=#FF0000>현재 팀에 속해 있지 않습니다.</color>", Player.localPlayer);
+                        return;
+                    }
+                    msg = msg.Substring(3);
+                    if(msg != string.Empty)
+                    {
+                        foreach (var player in GameManager.Instance.players)
+                        {
+                            if (player.team.Value != Team.None && player.team.Value == Player.localPlayer.team.Value)
+                            {
+                                MessageManager.Instance.SendMessageToPlayer($"<b>[팀 채팅] {SessionManager.Instance.playerName}</b>: {msg}", player);
+                            }
+                        }
                     }
                 }
+                else if (msg.StartsWith("/timer "))
+                {
+                    if(NetworkManager.Singleton.LocalClientId != GameManager.Instance.cheatOwner.Value)
+                    {
+                        MessageManager.Instance.SendMessageToPlayer("<color=#FF0000>치트 오너만 이 명령어를 사용할 수 있습니다.</color>", Player.localPlayer);
+                        return;
+                    }
+                    msg = msg.Substring(7);
+                    if (msg == "pause")
+                    {
+                        GameManager.Instance.timerPaused.Value = true; return;
+                    }
+                    if(msg == "resume")
+                    {
+                        GameManager.Instance.timerPaused.Value = false; return;
+                    }
+                    if(msg == "skip")
+                    {
+                        GameManager.Instance.timeLeft.Value = 1; return;
+                    }
+                    if (msg.StartsWith("add "))
+                    {
+                        msg = msg.Substring(4);
+                        if(int.TryParse(msg, out int val) && val > 0)
+                        {
+                            GameManager.Instance.timeLeft.Value += val;
+                        }
+                        else
+                        {
+                            MessageManager.Instance.SendMessageToPlayer("<color=#FF0000>유효한 숫자가 아닙니다.</color>", Player.localPlayer);
+                        }
+                    }
+                }
+                else if(msg.StartsWith("/transferOwner "))
+                {
+                    if (NetworkManager.Singleton.LocalClientId != GameManager.Instance.cheatOwner.Value)
+                    {
+                        MessageManager.Instance.SendMessageToPlayer("<color=#FF0000>치트 오너만 이 명령어를 사용할 수 있습니다.</color>", Player.localPlayer);
+                        return;
+                    }
+                    msg = msg.Substring(15);
+                    foreach (var i in GameManager.Instance.players)
+                    {
+                        if (i.playerName.Value == msg)
+                        {
+                            GameManager.Instance.ChangeCheatOwnerRpc(i.OwnerClientId); return;
+                        }
+                    }
+                    MessageManager.Instance.SendMessageToPlayer("<color=#FF0000>해당 플레이어를 찾지 못했습니다.</color>", Player.localPlayer);
+                    return;
+                }
+                else if (msg.StartsWith("/setTeam "))
+                {
+                    if (NetworkManager.Singleton.LocalClientId != GameManager.Instance.cheatOwner.Value)
+                    {
+                        MessageManager.Instance.SendMessageToPlayer("<color=#FF0000>치트 오너만 이 명령어를 사용할 수 있습니다.</color>", Player.localPlayer);
+                        return;
+                    }
+                    msg = msg.Substring(9);
+                    string playerName = msg.Substring(0, msg.IndexOf(' '));
+                    string team = msg.Substring(msg.IndexOf(' ') + 1);
+                    foreach (var i in GameManager.Instance.players)
+                    {
+                        if (i.playerName.Value == playerName)
+                        {
+                            if (i.inRound.Value)
+                            {
+                                MessageManager.Instance.SendMessageToPlayer("<color=#FF0000>라운드 진행 중인 플레이어의 팀을 바꿀 수 없습니다.</color>", Player.localPlayer);
+                                return;
+                            }
+                            switch (team)
+                            {
+                                case "red": i.SetTeamRpc(Team.Red); break;
+                                case "blue": i.SetTeamRpc(Team.Blue); break;
+                                case "none": i.SetTeamRpc(Team.None); break;
+                                default:
+                                    MessageManager.Instance.SendMessageToPlayer("<color=#FF0000>유효한 팀이 아닙니다. (blue/red/none)</color>", Player.localPlayer);
+                                    return;
+                            }
+                            return;
+                        }
+                    }
+                    MessageManager.Instance.SendMessageToPlayer("<color=#FF0000>해당 플레이어를 찾지 못했습니다.</color>", Player.localPlayer);
+                    return;
+                }
+                else if(msg.StartsWith("/spectator "))
+                {
+                    msg = msg.Substring(11);
+                    switch (msg)
+                    {
+                        case "true": Player.localPlayer.spectator.Value = true; break;
+                        case "false": Player.localPlayer.spectator.Value = false; break;
+                        default: MessageManager.Instance.SendMessageToPlayer("<color=#FF0000>유효한 값이 아닙니다. (true/false)", Player.localPlayer); return;
+                    }
+                }
+                MessageManager.Instance.SendMessageToPlayer("<color=#FF0000>유효한 명령어가 아닙니다.</color>", Player.localPlayer);
             }
             else
             {

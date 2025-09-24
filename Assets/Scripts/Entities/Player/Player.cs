@@ -1,11 +1,10 @@
 using System;
 using System.Linq;
 using NetworkAudioManagement;
+using Unity.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using static UnityEngine.UI.Image;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(NetworkTransform), typeof(NetworkRigidbody2D))]
 [RequireComponent(typeof(Player_HpComp), typeof(Player_WardComp), typeof(Player_Inventory))]
@@ -37,11 +36,15 @@ public class Player : Entity
     public float attackBuffCounter = 0.0f;
     public float attackMultiplier => attackBuffed.Value ? attackBuffMultiplier : 1.0f;
 
+    public readonly NetworkVariable<FixedString512Bytes> playerName = new();
+    public readonly NetworkVariable<bool> spectator = new(false);
+
     public readonly NetworkVariable<Team> team = new(Team.None);
     public readonly NetworkVariable<bool> PVP = new(false), inRound = new(false);
 
     public readonly NetworkVariable<int> playerKills = new(0);
     public readonly NetworkVariable<int> deaths = new(0);
+    [Rpc(SendTo.Authority)] public void SetSpectatorRpc(bool spectator) => this.spectator.Value = spectator;
     [Rpc(SendTo.Authority)] public void SetTeamRpc(Team team) => this.team.Value = team;
     [Rpc(SendTo.Authority)] public void SetPVPRpc(bool PVP) => this.PVP.Value = PVP;
     [Rpc(SendTo.Authority)] public void SetInRoundRpc(bool inRound) => this.inRound.Value = inRound;
@@ -72,6 +75,7 @@ public class Player : Entity
     }
     private void Start()
     {
+        GameManager.Instance.AddPlayer(this);
         attackBuffed.OnValueChanged += (prev, val) => attackBuffIndicator.gameObject.SetActive(val);
         attackBuffIndicator.gameObject.SetActive(attackBuffed.Value);
         if (IsLocalPlayer)
@@ -88,6 +92,8 @@ public class Player : Entity
         {
             topLayer = new(this);
             topLayer.OnStateEnter();
+            SessionManager.Instance.onPlayerNameChange += OnPlayerNameChange;
+            OnPlayerNameChange(SessionManager.Instance.playerName);
         }
     }
     readonly int relationID = Animator.StringToHash("Relation");
@@ -106,19 +112,17 @@ public class Player : Entity
         if (localPlayer != null) anim.SetFloat(relationID, (int)localPlayer.GetRelation(this));
         
     }
-    private void OnEnable()
-    {
-        GameManager.Instance.AddPlayer(this);
-    }
-    private void OnDisable()
-    {
-        GameManager.Instance.RemovePlayer(this);
-    }
     public override void OnDestroy()
     {
         base.OnDestroy();
-        if (IsOwner) topLayer.OnStateExit();
+        if (IsOwner)
+        {
+            topLayer.OnStateExit();
+            SessionManager.Instance.onPlayerNameChange -= OnPlayerNameChange;
+        }
+        GameManager.Instance.RemovePlayer(this);
     }
+    void OnPlayerNameChange(string playerName) => this.playerName.Value = playerName;
 
     public Relation GetRelation(Entity other)
     {

@@ -30,7 +30,15 @@ public class GameManager : NetworkBehaviour
     public readonly NetworkVariable<int> timeLeft = new(30);
     public readonly NetworkVariable<bool> timerPaused = new(false);
 
+    public readonly NetworkVariable<ulong> cheatOwner = new(0);
+
     public readonly List<Player> players = new();
+
+    [Rpc(SendTo.Authority)] public void ChangeCheatOwnerRpc(ulong cheatOwner, RpcParams rpcParams = new())
+    {
+        if (rpcParams.Receive.SenderClientId != this.cheatOwner.Value) return;
+        this.cheatOwner.Value = cheatOwner;
+    }
     private void Start()
     {
         var player = Instantiate(playerPrefab);
@@ -38,8 +46,28 @@ public class GameManager : NetworkBehaviour
         player.NetworkObject.SpawnAsPlayerObject(NetworkManager.Singleton.LocalClientId, true);
         player.hpComp.SetRespawnPosRpc(lobbySpawnPoint.position);
     }
-    public void AddPlayer(Player player) => players.Add(player);
-    public void RemovePlayer(Player player) => players.Remove(player);
+    public void AddPlayer(Player player)
+    {
+        if (HasAuthority)
+        {
+            if(players.Count == 0)
+            {
+                cheatOwner.Value = player.OwnerClientId;
+            }
+        }
+        players.Add(player);
+    }
+    public void RemovePlayer(Player player)
+    {
+        players.Remove(player);
+        if (HasAuthority)
+        {
+            if(cheatOwner.Value == player.OwnerClientId)
+            {
+                if (players.Count > 0) cheatOwner.Value = players[0].OwnerClientId;
+            }
+        }
+    }
     public Player GetPlayer(ulong clientID)
     {
         foreach (var i in players) if (i.OwnerClientId == clientID) return i;
@@ -85,15 +113,30 @@ public class GameManager : NetworkBehaviour
         timeLeft.Value = roundTime;
         NetworkAudioManager.Instance.ChangeMusic("InGame");
         List<Player> playerCache = players.ToList();
-        List<Player> teamRed = new();
+        playerCache.RemoveAll(item => item.spectator.Value);
+        List<Player> teamRed = new(), teamBlue = new();
         int tmp = playerCache.Count;
-        for(int i = 0; i < tmp / 2; i++)
+        for(int i = 0; i < playerCache.Count;)
+        {
+            if (playerCache[i].team.Value == Team.Blue)
+            {
+                teamBlue.Add(playerCache[i]);
+                playerCache.RemoveAt(i); continue;
+            }
+            if (playerCache[i].team.Value == Team.Red)
+            {
+                teamRed.Add(playerCache[i]);
+                playerCache.RemoveAt(i); continue;
+            }
+            i++;
+        }
+        while(playerCache.Count > 0)
         {
             Player player = playerCache[UnityEngine.Random.Range(0, playerCache.Count)];
-            teamRed.Add(player);
+            if (teamRed.Count > teamBlue.Count) teamBlue.Add(player);
+            else teamRed.Add(player);
             playerCache.Remove(player);
         }
-        List<Player> teamBlue = playerCache;
         foreach (var i in teamRed)
         {
             i.SetTeamRpc(Team.Red);

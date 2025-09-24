@@ -43,6 +43,7 @@ public class Player_Inventory : NetworkBehaviour
 
     [Header("Drops")]
     [SerializeField] float dropForce = 3.0f;
+    [SerializeField] KeyCode boltDropKey = KeyCode.Q;
     [SerializeField] GasPickup gasPickupPrefab;
     [SerializeField] BoltPickup boltPickupPrefab;
 
@@ -117,6 +118,15 @@ public class Player_Inventory : NetworkBehaviour
             {
                 pickup.PickupRpc(origin);
             }
+        }
+        if (Input.GetKeyDown(boltDropKey) && bolt.Value >= 10)
+        {
+            bolt.Value -= 10;
+            Vector2 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector2 dir = (pos - (Vector2)transform.position).normalized;
+            BoltPickup tmp = Instantiate(boltPickupPrefab, transform.position, Quaternion.identity);
+            tmp.rb.linearVelocity = dir * dropForce;
+            tmp.NetworkObject.Spawn();
         }
     }
     void ResetInventory()

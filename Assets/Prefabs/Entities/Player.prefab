@@ -5543,8 +5543,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  targetPlayer: {fileID: 908334110077406541}
   playerNameText: {fileID: 942588230358306137}
   visibleDistance: 10
+  noTeam: {r: 1, g: 1, b: 1, a: 1}
+  redTeam: {r: 1, g: 0, b: 0, a: 1}
+  blueTeam: {r: 0, g: 0, b: 1, a: 1}
+  spectator: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.39215687}
 --- !u!1 &3291262706514632964
 GameObject:
   m_ObjectHideFlags: 0
@@ -5690,7 +5695,7 @@ MonoBehaviour:
   GlobalObjectIdHash: 138618184
   InScenePlacedSourceGlobalObjectIdHash: 138618184
   DeferredDespawnTick: 0
-  Ownership: 0
+  Ownership: 4
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
