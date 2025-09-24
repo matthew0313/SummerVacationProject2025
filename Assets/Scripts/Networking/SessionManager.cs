@@ -73,7 +73,7 @@ public class SessionManager : MonoBehaviour
             { playerNamePropertyKey, playerNameProperty }
         };
     }
-    public const int maxPlayers = 8;
+    public const int maxPlayers = 9;
     private async Task<SessionOptions> GetSessionOptions()
     {
         Dictionary<string, PlayerProperty> playerProperties = await GetPlayerProperties();
