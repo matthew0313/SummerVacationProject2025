@@ -9,12 +9,11 @@ public class TeamActivator : MonoBehaviour, ILocalPlayerSpawnCallback
     [SerializeField] Team team;
     public void OnLocalPlayerSpawn(Player localPlayer)
     {
-        localPlayer.team.OnValueChanged += (prev, val) => Check();
-        localPlayer.inRound.OnValueChanged += (prev, val) => Check();
-        Check();
+        localPlayer.team.OnValueChanged += Check;
+        Check(Team.None, localPlayer.team.Value);
     }
-    void Check()
+    void Check(Team prev, Team val)
     {
-        gameObject.SetActive(Player.localPlayer.inRound.Value && Player.localPlayer.team.Value == team);
+        gameObject.SetActive(val == team);
     }
 }

@@ -39,6 +39,16 @@ public class GameManager : NetworkBehaviour
         if (rpcParams.Receive.SenderClientId != this.cheatOwner.Value) return;
         this.cheatOwner.Value = cheatOwner;
     }
+    [Rpc(SendTo.Authority)] public void ChangeTimeLeftRpc(int timeLeft, RpcParams rpcParams = new())
+    {
+        if (rpcParams.Receive.SenderClientId != this.cheatOwner.Value) return;
+        this.timeLeft.Value = timeLeft;
+    }
+    [Rpc(SendTo.Authority)] public void ChangeTimerPausedRpc(bool timerPaused, RpcParams rpcParams = new())
+    {
+        if (rpcParams.Receive.SenderClientId != this.cheatOwner.Value) return;
+        this.timerPaused.Value = timerPaused;
+    }
     private void Start()
     {
         var player = Instantiate(playerPrefab);
@@ -105,15 +115,15 @@ public class GameManager : NetworkBehaviour
     void StartRound()
     {
         if (!HasAuthority) return;
-        if (players.Count < 2)
+        List<Player> playerCache = players.ToList();
+        playerCache.RemoveAll(item => item.spectator.Value);
+        if (playerCache.Count < 2)
         {
             timeLeft.Value = intermissionTime; return;
         }
         gameState.Value = GameState.RoundInProgress;
         timeLeft.Value = roundTime;
         NetworkAudioManager.Instance.ChangeMusic("InGame");
-        List<Player> playerCache = players.ToList();
-        playerCache.RemoveAll(item => item.spectator.Value);
         List<Player> teamRed = new(), teamBlue = new();
         int tmp = playerCache.Count;
         for(int i = 0; i < playerCache.Count;)
@@ -142,19 +152,61 @@ public class GameManager : NetworkBehaviour
             i.SetTeamRpc(Team.Red);
             i.hpComp.SetRespawnPosRpc(teamRedSpawnpoint.position);
             i.TeleportRpc(teamRedSpawnpoint.position);
+            i.SetPVPRpc(true);
+            i.SetInRoundRpc(true);
         }
         foreach (var i in teamBlue)
         {
             i.SetTeamRpc(Team.Blue);
             i.hpComp.SetRespawnPosRpc(teamBlueSpawnpoint.position);
             i.TeleportRpc(teamBlueSpawnpoint.position);
-        }
-        foreach (var i in players)
-        {
             i.SetPVPRpc(true);
             i.SetInRoundRpc(true);
         }
         OnRoundStartRpc();
+    }
+    [Rpc(SendTo.Authority)]
+    public void ForcedJoinRpc(ulong clientID, RpcParams rpcParams = new())
+    {
+        if (rpcParams.Receive.SenderClientId != cheatOwner.Value) return;
+        Player player = GetPlayer(clientID);
+        if (player.inRound.Value) return;
+        player.SetInRoundRpc(true);
+        player.SetPVPRpc(true);
+        if(player.team.Value == Team.Red)
+        {
+            player.hpComp.SetRespawnPosRpc(teamRedSpawnpoint.position);
+            player.TeleportRpc(teamRedSpawnpoint.position);
+            return;
+        }
+        if (player.team.Value == Team.Blue)
+        {
+            player.hpComp.SetRespawnPosRpc(teamBlueSpawnpoint.position);
+            player.TeleportRpc(teamBlueSpawnpoint.position);
+            return;
+        }
+        List<Player> teamRed = new(), teamBlue = new();
+        foreach(var i in players)
+        {
+            if (i.inRound.Value)
+            {
+                if (i.team.Value == Team.Red) teamRed.Add(i);
+                if (i.team.Value == Team.Blue) teamBlue.Add(i);
+            }
+        }
+        if(teamRed.Count > teamBlue.Count)
+        {
+            player.SetTeamRpc(Team.Blue);
+            player.hpComp.SetRespawnPosRpc(teamBlueSpawnpoint.position);
+            player.TeleportRpc(teamBlueSpawnpoint.position);
+        }
+        else
+        {
+            player.SetTeamRpc(Team.Red);
+            player.hpComp.SetRespawnPosRpc(teamRedSpawnpoint.position);
+            player.TeleportRpc(teamRedSpawnpoint.position);
+        }
+
     }
     public event Action onRoundStart, onRoundEnd;
     public event Action<RoundResult> onRoundComplete;

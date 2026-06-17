@@ -8,7 +8,7 @@ public class Player_HpComp : HpComp
     Player origin;
     public override Entity owner => origin;
 
-    [SerializeField] float respawnTime = 3.0f;
+    [SerializeField] float respawnTime = 3.0f, regenTime = 15.0f, regenTick = 1.0f, regenAmount = 1.0f;
     public Vector2 respawnPos = Vector2.zero;
 
     [Rpc(SendTo.Owner)]
@@ -17,6 +17,25 @@ public class Player_HpComp : HpComp
     {
         base.Awake();
         origin = GetComponent<Player>();
+    }
+    float regenCounter = 0.0f, regenTickCounter = 0.0f;
+    private void Update()
+    {
+        if (!HasAuthority) return;
+        if (regenCounter > 0.0f)
+        {
+            regenCounter -= Time.deltaTime;
+            regenTickCounter = 0.0f;
+        }
+        else
+        {
+            if (regenTickCounter < regenTick) regenTickCounter += Time.deltaTime;
+            else
+            {
+                regenTickCounter -= regenTick;
+                Heal(1.0f);
+            }
+        }
     }
     private void Start()
     {
@@ -37,6 +56,7 @@ public class Player_HpComp : HpComp
         if (!info.isNullified)
         {
             origin.animations.TriggerDamageRpc();
+            regenCounter = regenTime;
         }
         return info;
     }

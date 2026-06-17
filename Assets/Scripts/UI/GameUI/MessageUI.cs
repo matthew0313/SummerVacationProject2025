@@ -6,7 +6,6 @@ using Unity.Collections;
 using Unity.Services.Authentication;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
-using UnityEditor.Experimental.GraphView;
 
 public class MessageUI : MonoBehaviour
 {
@@ -68,26 +67,26 @@ public class MessageUI : MonoBehaviour
                     msg = msg.Substring(7);
                     if (msg == "pause")
                     {
-                        GameManager.Instance.timerPaused.Value = true; return;
+                        GameManager.Instance.ChangeTimerPausedRpc(true); return;
                     }
                     if(msg == "resume")
                     {
-                        GameManager.Instance.timerPaused.Value = false; return;
+                        GameManager.Instance.ChangeTimerPausedRpc(false); return;
                     }
                     if(msg == "skip")
                     {
-                        GameManager.Instance.timeLeft.Value = 1; return;
+                        GameManager.Instance.ChangeTimeLeftRpc(1); return;
                     }
                     if (msg.StartsWith("add "))
                     {
                         msg = msg.Substring(4);
                         if(int.TryParse(msg, out int val) && val > 0)
                         {
-                            GameManager.Instance.timeLeft.Value += val;
+                            GameManager.Instance.timeLeft.Value += val; return;
                         }
                         else
                         {
-                            MessageManager.Instance.SendMessageToPlayer("<color=#FF0000>유효한 숫자가 아닙니다.</color>", Player.localPlayer);
+                            MessageManager.Instance.SendMessageToPlayer("<color=#FF0000>유효한 숫자가 아닙니다.</color>", Player.localPlayer); return;
                         }
                     }
                 }
@@ -145,6 +144,11 @@ public class MessageUI : MonoBehaviour
                 }
                 else if(msg.StartsWith("/spectator "))
                 {
+                    if (Player.localPlayer.inRound.Value)
+                    {
+                        MessageManager.Instance.SendMessageToPlayer("<color=#FF0000>라운드 진행 중 관전자로 전환할 수 없습니다.</color>", Player.localPlayer);
+                        return;
+                    }
                     msg = msg.Substring(11);
                     switch (msg)
                     {
@@ -152,6 +156,27 @@ public class MessageUI : MonoBehaviour
                         case "false": Player.localPlayer.spectator.Value = false; break;
                         default: MessageManager.Instance.SendMessageToPlayer("<color=#FF0000>유효한 값이 아닙니다. (true/false)", Player.localPlayer); return;
                     }
+                    return;
+                }
+                else if(msg.StartsWith("/forcedJoin "))
+                {
+                    if (NetworkManager.Singleton.LocalClientId != GameManager.Instance.cheatOwner.Value)
+                    {
+                        MessageManager.Instance.SendMessageToPlayer("<color=#FF0000>치트 오너만 이 명령어를 사용할 수 있습니다.</color>", Player.localPlayer);
+                        return;
+                    }
+                    msg = msg.Substring(12);
+                    foreach (var i in GameManager.Instance.players)
+                    {
+                        if (i.playerName.Value == msg && !i.inRound.Value)
+                        {
+                            GameManager.Instance.ForcedJoinRpc(i.OwnerClientId);
+                            return;
+                        }
+                    }
+                    MessageManager.Instance.SendMessageToPlayer("<color=#FF0000>해당 플레이어를 찾지 못했습니다.</color>", Player.localPlayer);
+                    return;
+
                 }
                 MessageManager.Instance.SendMessageToPlayer("<color=#FF0000>유효한 명령어가 아닙니다.</color>", Player.localPlayer);
             }

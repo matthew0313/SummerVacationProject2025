@@ -140,7 +140,6 @@ public class Player_Inventory : NetworkBehaviour
     {
         slots[slotIndex].OnSlotUnequip();
         ward = 0; potion1 = 0; potion2 = 0;
-        mortarUnlocked = false;
         for (int i = 0; i < gas.Value / 10 / 2; i++)
         {
             GasPickup tmp = Instantiate(gasPickupPrefab, transform.position, Quaternion.identity);

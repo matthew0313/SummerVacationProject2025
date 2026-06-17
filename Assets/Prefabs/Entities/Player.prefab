@@ -5745,6 +5745,9 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   defaultHp: 100
   respawnTime: 3
+  regenTime: 15
+  regenTick: 1
+  regenAmount: 3
   respawnPos: {x: 0, y: 0}
 --- !u!114 &4438091874343390211
 MonoBehaviour:
@@ -5805,6 +5808,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4096
   dropForce: 3
+  boltDropKey: 113
   gasPickupPrefab: {fileID: 3529623625717076321, guid: 1c08e6100c624574eb42067615051490, type: 3}
   boltPickupPrefab: {fileID: 7221099458735603883, guid: b88e5efb427f20a4cb9935a1147bb6cb, type: 3}
 --- !u!114 &575728927871163107

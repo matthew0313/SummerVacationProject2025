@@ -97,7 +97,6 @@ public class Mortar : Weapon
 
     private IEnumerator ShootAfterDelay()
     {
-        owner.inventory.mortarUnlocked = false;
         owner.speedMultiplier *= shootSpeed;
         isShooting = true;
         animator.Animator.SetBool("Shooting", true);
@@ -105,6 +104,7 @@ public class Mortar : Weapon
         animator.SetTrigger("Shoot");
         animator.Animator.SetBool("Shooting", false);
         owner.inventory.mortarUnlocked = false;
+        owner.inventory.ChangeSlot(0);
         NetworkAudioManager.Instance.PlaySound(fireSound)
             .SetDistance(firePoint.position, fireSoundMinDist, fireSoundMaxDist);
 
@@ -123,8 +123,6 @@ public class Mortar : Weapon
         isShooting = false;
         owner.speedMultiplier /= shootSpeed;
         animator.Animator.SetBool("Shooting", false);
-        owner.inventory.ChangeSlot(0);
-
     }
 
     private void OnTriggerEnter2D(Collider2D other)

@@ -24,7 +24,7 @@ public class PlayerNameUI : NetworkBehaviour
         if (!IsOwner && Player.localPlayer != null)
         {
             Vector2 dir = Player.localPlayer.transform.position - targetPlayer.transform.position;
-            playerNameText.gameObject.SetActive(dir.magnitude <= visibleDistance);
+            playerNameText.gameObject.SetActive(!Player.localPlayer.inRound.Value || dir.magnitude <= visibleDistance);
         }
         if (targetPlayer.spectator.Value)
         {

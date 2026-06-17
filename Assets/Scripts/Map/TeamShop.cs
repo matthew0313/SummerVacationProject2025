@@ -40,17 +40,20 @@ public class TeamShop : MortarTarget
     float counter = 0.0f;
     private void Update()
     {
-        if (!HasAuthority || GameManager.Instance.gameState.Value != GameState.RoundInProgress) return;
+        if (GameManager.Instance.gameState.Value != GameState.RoundInProgress) return;
         if (broken.Value)
         {
-            counter += Time.deltaTime;
-            if (counter >= 1.0f)
+            if (HasAuthority)
             {
-                counter -= 1.0f;
-                if (--regenCounter.Value <= 0)
+                counter += Time.deltaTime;
+                if (counter >= 1.0f)
                 {
-                    broken.Value = false;
-                    anim.SetBool(brokenID, false);
+                    counter -= 1.0f;
+                    if (--regenCounter.Value <= 0)
+                    {
+                        broken.Value = false;
+                        anim.SetBool(brokenID, false);
+                    }
                 }
             }
             interactIndicator.SetActive(false);
